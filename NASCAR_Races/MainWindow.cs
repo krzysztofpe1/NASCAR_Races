@@ -13,7 +13,7 @@ namespace NASCAR_Races
             int maxY=mainPictureBox.Height;
             int straightLength=maxX/2;
             int turnRadius=maxX/5;
-            int pitPosY= maxY / 2 + maxX / 4;
+            int pitPosY= maxY / 2 + maxX / 7;
             int turnCurveRadius = 0;
             //int totalLength = (int)(maxX + 2 * 3.1415 * turnRadius);
             raceManager = new(straightLength, turnRadius, pitPosY, turnCurveRadius);
