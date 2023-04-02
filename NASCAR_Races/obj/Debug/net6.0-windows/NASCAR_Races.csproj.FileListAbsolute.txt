@@ -1,0 +1,17 @@
+Y:\C#\NASCAR_Races\NASCAR_Races\bin\Debug\net6.0-windows\NASCAR_Races.exe
+Y:\C#\NASCAR_Races\NASCAR_Races\bin\Debug\net6.0-windows\NASCAR_Races.deps.json
+Y:\C#\NASCAR_Races\NASCAR_Races\bin\Debug\net6.0-windows\NASCAR_Races.runtimeconfig.json
+Y:\C#\NASCAR_Races\NASCAR_Races\bin\Debug\net6.0-windows\NASCAR_Races.dll
+Y:\C#\NASCAR_Races\NASCAR_Races\bin\Debug\net6.0-windows\NASCAR_Races.pdb
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.csproj.AssemblyReference.cache
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.MainWindow.resources
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.csproj.GenerateResource.cache
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.GeneratedMSBuildEditorConfig.editorconfig
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.AssemblyInfoInputs.cache
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.AssemblyInfo.cs
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.csproj.CoreCompileInputs.cache
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.dll
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\refint\NASCAR_Races.dll
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.pdb
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\NASCAR_Races.genruntimeconfig.cache
+Y:\C#\NASCAR_Races\NASCAR_Races\obj\Debug\net6.0-windows\ref\NASCAR_Races.dll
