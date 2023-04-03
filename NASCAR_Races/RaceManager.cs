@@ -20,6 +20,24 @@ namespace NASCAR_Races
             this.turnCurveRadius = turnCurveRadius;
         }
 
+        public static List<Car> CreateListOfCars(int numberOfCars)
+        {
+            List<Car> litsOfCars = new List<Car>();
 
+            for (int i = 0; i < numberOfCars; i++)
+            {
+                Car car = new Car(570f, 100f);
+                litsOfCars.Add(car);
+            }
+            return litsOfCars;
+        }
+
+        internal static void MoveCars(List<Car> listOfCars)
+        {
+            foreach(Car car in listOfCars)
+            {
+                car.X += 1.0f;
+            }
+        }
     }
 }
