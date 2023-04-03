@@ -18,6 +18,9 @@ namespace NASCAR_Races
             //int totalLength = (int)(maxX + 2 * 3.1415 * turnRadius);
             raceManager = new(straightLength, turnRadius, pitPosY, turnCurveRadius);
             painter = new(maxX, maxY, straightLength, turnRadius, pitPosY);
+
+            int numberOfCars = 1;
+            List<Car> listOfCars = RaceManager.CreateListOfCars(numberOfCars);
         }
 
         //metoda odœwie¿ania ekranu, wywo³ywana automatycznie, gdy system uwa¿a, ¿e nale¿y j¹ wywo³aæ.
