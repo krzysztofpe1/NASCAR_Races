@@ -26,7 +26,8 @@ namespace NASCAR_Races
 
             for (int i = 0; i < numberOfCars; i++)
             {
-                Car car = new Car(570f, 100f);
+                Engine engine = new Engine(1000, 1000, 200, 1);
+                Car car = new Car(570, 100, 1000, 0, engine);
                 litsOfCars.Add(car);
             }
             return litsOfCars;
@@ -34,9 +35,14 @@ namespace NASCAR_Races
 
         internal static void MoveCars(List<Car> listOfCars)
         {
-            for(int i =0;i<listOfCars.Count;i++)
+            foreach (Car car in listOfCars)
             {
-                listOfCars[i].x += 1.0f;
+                if (car.engine == null)
+                {
+                    throw new InvalidOperationException("Car does not have an engine");
+                }
+
+                car.x += Physics.Street(car.engine.speed);
             }
         }
     }

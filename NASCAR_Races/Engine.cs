@@ -3,10 +3,10 @@
     public class Engine
     {
 
-        float fuelCapacity;
-        float fuel { get; set; }
-        float maxSpeed;
-        float speed;
+        public float fuelCapacity;
+        public float fuel { get; set; }
+        public float maxSpeed;
+        public float speed;
 
         public Engine()
         {
