@@ -32,6 +32,12 @@ namespace NASCAR_Races
             return litsOfCars;
         }
 
-
+        internal static void MoveCars(List<Car> listOfCars)
+        {
+            foreach(Car car in listOfCars)
+            {
+                car.X += 1.0f;
+            }
+        }
     }
 }

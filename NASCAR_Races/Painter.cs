@@ -46,7 +46,7 @@ namespace NASCAR_Races
             g.DrawLine(penCircuit, x1, canvasHeight / 2 + turnRadius, x2 + 1, canvasHeight / 2 + turnRadius);
         }
 
-        internal void CarsPosition(Graphics g, List<Car> listOfCars)
+        internal void PaintCarsPosition(Graphics g, List<Car> listOfCars)
         {
             if (listOfCars.Count() == 0)
             {

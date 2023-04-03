@@ -1,4 +1,5 @@
 using System.Windows.Forms;
+using System.Threading;
 
 namespace NASCAR_Races
 {
@@ -10,11 +11,11 @@ namespace NASCAR_Races
         public MainWindow()
         {
             InitializeComponent();
-            int maxX=mainPictureBox.Width;
-            int maxY=mainPictureBox.Height;
-            int straightLength=maxX/2;
-            int turnRadius=maxX/5;
-            int pitPosY= maxY / 2 + maxX / 7;
+            int maxX = mainPictureBox.Width;
+            int maxY = mainPictureBox.Height;
+            int straightLength = maxX / 2;
+            int turnRadius = maxX / 5;
+            int pitPosY = maxY / 2 + maxX / 7;
             int turnCurveRadius = 0;
             //int totalLength = (int)(maxX + 2 * 3.1415 * turnRadius);
             raceManager = new(straightLength, turnRadius, pitPosY, turnCurveRadius);
@@ -29,12 +30,13 @@ namespace NASCAR_Races
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
             painter.PaintCircuit(e.Graphics);
-            painter.CarsPosition(e.Graphics, listOfCars);
+            painter.PaintCarsPosition(e.Graphics, listOfCars);
         }
 
-        public void RunRace()
+        internal void RunRace()
         {
-
+            RaceManager.MoveCars(listOfCars);
         }
+
     }
 }
