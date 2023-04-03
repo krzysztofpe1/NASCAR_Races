@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-
-
 namespace NASCAR_Races
 {
     public class RaceManager
     {
-
         const int X_MAX = 900;
         const int X_MIN = 280;
         const int X_MID = (X_MAX + X_MIN) / 2;
@@ -37,7 +33,7 @@ namespace NASCAR_Races
 
             for (int i = 0; i < numberOfCars; i++)
             {
-                Engine engine = new Engine(1000, 1000, 200, 1);
+                Engine engine = new Engine(1000, 1000, 200, 1, 20);
                 Car car = new Car(570, 550, 1000, 0, engine);
                 litsOfCars.Add(car);
             }
