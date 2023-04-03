@@ -23,6 +23,8 @@ namespace NASCAR_Races
 
             int numberOfCars = 1;
             listOfCars = RaceManager.CreateListOfCars(numberOfCars);
+
+            
         }
 
         //metoda odœwie¿ania ekranu, wywo³ywana automatycznie, gdy system uwa¿a, ¿e nale¿y j¹ wywo³aæ.
@@ -36,6 +38,7 @@ namespace NASCAR_Races
         internal void RunRace()
         {
             RaceManager.MoveCars(listOfCars);
+            mainPictureBox.Invalidate();
         }
 
     }
