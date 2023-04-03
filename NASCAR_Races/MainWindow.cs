@@ -6,6 +6,7 @@ namespace NASCAR_Races
     {
         Painter painter;
         RaceManager raceManager;
+        List<Car> listOfCars;
         public MainWindow()
         {
             InitializeComponent();
@@ -20,7 +21,7 @@ namespace NASCAR_Races
             painter = new(maxX, maxY, straightLength, turnRadius, pitPosY);
 
             int numberOfCars = 1;
-            List<Car> listOfCars = RaceManager.CreateListOfCars(numberOfCars);
+            listOfCars = RaceManager.CreateListOfCars(numberOfCars);
         }
 
         //metoda odœwie¿ania ekranu, wywo³ywana automatycznie, gdy system uwa¿a, ¿e nale¿y j¹ wywo³aæ.
@@ -28,6 +29,7 @@ namespace NASCAR_Races
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
             painter.PaintCircuit(e.Graphics);
+            painter.CarsPosition(e.Graphics, listOfCars);
         }
 
         public void RunRace()

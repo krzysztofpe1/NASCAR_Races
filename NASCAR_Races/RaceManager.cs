@@ -24,9 +24,9 @@ namespace NASCAR_Races
         {
             List<Car> litsOfCars = new List<Car>();
 
-            for (int i = 0; i > numberOfCars; i++)
+            for (int i = 0; i < numberOfCars; i++)
             {
-                Car car = new Car();
+                Car car = new Car(570f, 100f);
                 litsOfCars.Add(car);
             }
             return litsOfCars;
