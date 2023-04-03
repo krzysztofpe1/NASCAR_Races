@@ -1,24 +1,28 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {}
+    "E:\\Repository\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {}
   },
   "projects": {
-    "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {
+    "E:\\Repository\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
+        "projectUniqueName": "E:\\Repository\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
         "projectName": "NASCAR_Races",
-        "projectPath": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
-        "packagesPath": "C:\\Users\\krzys\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\obj\\",
+        "projectPath": "E:\\Repository\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
+        "packagesPath": "C:\\Users\\kubas\\.nuget\\packages\\",
+        "outputPath": "E:\\Repository\\NASCAR_Races\\NASCAR_Races\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\krzys\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kubas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0-windows"
+          "net6.0-windows7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -45,8 +49,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -58,7 +61,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

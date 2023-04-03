@@ -23,7 +23,8 @@ namespace NASCAR_Races
 
             int numberOfCars = 1;
             listOfCars = RaceManager.CreateListOfCars(numberOfCars);
-            programTimer.Interval = 10;//Interval of Timer executing event "Tick" (in milliseconds)
+
+            programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)
             programTimer.Tick += new EventHandler(RunRace);
             programTimer.Start();
         }

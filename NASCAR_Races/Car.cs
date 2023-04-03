@@ -9,42 +9,28 @@ namespace NASCAR_Races
     public class Car
     {
         float weight;
-        float fuelCapacity;
-        float fuel { get; set; }
-        float maxSpeed;
-        float speed;
         float headingAngle;
-        public float X, Y;
+        public float x, y;
+        Engine engine;
 
-        public float Height;
-        public float Width;
+        public float height = 5.0f;
+        public float width = 10.0f;
 
-        public Car() {
-            this.Height = 5.0f;
-            this.Width = 10.0f;
-        }
+        public Car() {}
 
         public Car(float x, float y)
         {
-            this.X = x;
-            this.Y = y;
-            this.Height = 5.0f;
-            this.Width = 10.0f;
+            this.x = x;
+            this.y = y;
         }
 
-        public Car(float weight, float fuelCapacity, float fuel, float maxSpeed, float speed, float headingAngle, float x, float y)
+        public Car(float weight, float headingAngle, float x, float y, Engine engine)
         {
             this.weight = weight;
-            this.fuelCapacity = fuelCapacity;
-            this.fuel = fuel;
-            this.maxSpeed = maxSpeed;
-            this.speed = speed;
             this.headingAngle = headingAngle;
-            this.X = x;
-            this.Y = y;
-
-            this.Height = 5.0f;
-            this.Width = 10.0f;
+            this.x = x;
+            this.y = y;
+            this.engine = engine;
         }
     }
 }

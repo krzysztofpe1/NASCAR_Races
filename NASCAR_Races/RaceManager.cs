@@ -36,7 +36,7 @@ namespace NASCAR_Races
         {
             for(int i =0;i<listOfCars.Count;i++)
             {
-                listOfCars[i].X += 1.0f;
+                listOfCars[i].x += 1.0f;
             }
         }
     }

@@ -58,7 +58,7 @@ namespace NASCAR_Races
             foreach (Car car in listOfCars)
             {
                 Pen penCar = new Pen(Color.Red, brushSize);
-                g.DrawRectangle(penCar, car.X, car.Y, car.Width , car.Height);
+                g.DrawRectangle(penCar, car.x, car.y, car.width , car.height);
             }
             
         }
