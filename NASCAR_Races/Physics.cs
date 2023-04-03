@@ -7,5 +7,15 @@
         {
             return speed * 3;
         }
+
+        internal static float MileageFuel()
+        {
+            return 0;
+        }
+
+        internal static float Velocity()
+        {
+            return 0;
+        }
     }
 }
