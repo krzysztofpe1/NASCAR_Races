@@ -23,6 +23,9 @@ namespace NASCAR_Races
 
             int numberOfCars = 1;
             listOfCars = RaceManager.CreateListOfCars(numberOfCars);
+            programTimer.Interval = 10;//Interval of Timer executing event "Tick" (in milliseconds)
+            programTimer.Tick += new EventHandler(RunRace);
+            programTimer.Start();
         }
 
         //metoda odœwie¿ania ekranu, wywo³ywana automatycznie, gdy system uwa¿a, ¿e nale¿y j¹ wywo³aæ.
@@ -33,9 +36,10 @@ namespace NASCAR_Races
             painter.PaintCarsPosition(e.Graphics, listOfCars);
         }
 
-        internal void RunRace()
+        internal void RunRace(object sender, EventArgs e)
         {
             RaceManager.MoveCars(listOfCars);
+            mainPictureBox.Invalidate();
         }
 
     }
