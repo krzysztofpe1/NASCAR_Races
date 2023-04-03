@@ -5,7 +5,7 @@
 
         internal static float Street(float speed)
         {
-            return speed * 10;
+            return speed * 3;
         }
     }
 }
