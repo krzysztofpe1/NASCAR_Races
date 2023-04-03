@@ -34,9 +34,9 @@ namespace NASCAR_Races
 
         internal static void MoveCars(List<Car> listOfCars)
         {
-            foreach(Car car in listOfCars)
+            for(int i =0;i<listOfCars.Count;i++)
             {
-                car.X += 1.0f;
+                listOfCars[i].X += 1.0f;
             }
         }
     }

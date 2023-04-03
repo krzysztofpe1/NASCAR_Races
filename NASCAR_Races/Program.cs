@@ -8,7 +8,6 @@ namespace NASCAR_Races
             ApplicationConfiguration.Initialize();
             MainWindow mainWindow = new MainWindow();
             Application.Run(mainWindow);
-            mainWindow.RunRace();
         }
     }
 }

@@ -28,26 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             mainPictureBox = new PictureBox();
+            programTimer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)mainPictureBox).BeginInit();
             SuspendLayout();
             // 
             // mainPictureBox
             // 
             mainPictureBox.Location = new Point(0, 0);
+            mainPictureBox.Margin = new Padding(3, 4, 3, 4);
             mainPictureBox.Name = "mainPictureBox";
-            mainPictureBox.Size = new Size(1183, 661);
+            mainPictureBox.Size = new Size(1352, 881);
             mainPictureBox.TabIndex = 0;
             mainPictureBox.TabStop = false;
             mainPictureBox.Paint += mainPictureBox_Paint;
             // 
             // MainWindow
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1184, 661);
+            ClientSize = new Size(1353, 881);
             Controls.Add(mainPictureBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Margin = new Padding(3, 4, 3, 4);
             Name = "MainWindow";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)mainPictureBox).EndInit();
@@ -57,5 +61,6 @@
         #endregion
 
         private PictureBox mainPictureBox;
+        private System.Windows.Forms.Timer programTimer;
     }
 }
