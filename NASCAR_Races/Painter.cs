@@ -12,6 +12,13 @@ namespace NASCAR_Races
         int straightLength;
         int turnRadius;
         int pitPosY;
+        Pen penCircuit;
+        Pen penPit;
+        Pen penCar;
+        int halfPaintBrushSize = 30;
+        //Points of start and end of the straights
+        public List<Car> listOfCars { set; get; }
+        int x1, x2;
         public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY)
         {
             this.canvasWidth = canvasWidth;
@@ -19,18 +26,20 @@ namespace NASCAR_Races
             this.straightLength = straightLength;
             this.turnRadius = turnRadius;
             this.pitPosY = pitPosY;
+
+            halfPaintBrushSize = 30;
+            penCircuit = new Pen(Color.Black, halfPaintBrushSize * 2);
+            penPit = new Pen(Color.Orange, halfPaintBrushSize);
+            penCar = new Pen(Color.Red, 5);//size of paint brush for car
+            x1 = canvasWidth / 2 - straightLength / 2;
+            x2 = canvasWidth / 2 + straightLength / 2;
         }
         public void PaintCircuit(Graphics g)
         {
-            int halfPaintBrushSize=30;
-            Pen penCircuit = new Pen(Color.Black, halfPaintBrushSize*2);
-            Pen penPit = new Pen(Color.Orange, halfPaintBrushSize);
+            
             //Pen temp1 = new Pen(Color.Orange, halfPaintBrushSize * 2);
             //Pen temp2 = new Pen(Color.Green, halfPaintBrushSize * 2);
-
-            //Points of beggining and end of the straights
-            int x1 = canvasWidth / 2 - straightLength / 2;
-            int x2 = canvasWidth / 2 + straightLength / 2;
+            
             //Painting Pit Stop
             g.DrawLine(penPit, x1, pitPosY, x2+1, pitPosY);
             int startX = x1 - turnRadius + halfPaintBrushSize / 2, startY = canvasHeight / 2 - pitPosY / 2;
@@ -46,21 +55,10 @@ namespace NASCAR_Races
             g.DrawLine(penCircuit, x1, canvasHeight / 2 + turnRadius, x2 + 1, canvasHeight / 2 + turnRadius);
         }
 
-        internal void PaintCarsPosition(Graphics g, List<Car> listOfCars)
+        internal void PaintCarsPosition(Graphics g)
         {
-            if (listOfCars.Count() == 0)
-            {
-                throw new InvalidOperationException("List of cars is empty");
-            }
-
-
-            int brushSize = 5;
-            foreach (Car car in listOfCars)
-            {
-                Pen penCar = new Pen(Color.Red, brushSize);
-                g.DrawRectangle(penCar, car.x, car.y, car.width , car.height);
-            }
-            
+            if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
+            foreach (Car car in listOfCars) g.DrawRectangle(penCar, car.x, car.y, car.length, car.width);
         }
         
     }

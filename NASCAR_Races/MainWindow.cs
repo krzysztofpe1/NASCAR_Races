@@ -7,7 +7,6 @@ namespace NASCAR_Races
     {
         Painter painter;
         RaceManager raceManager;
-        List<Car> listOfCars;
         public MainWindow()
         {
             InitializeComponent();
@@ -17,12 +16,12 @@ namespace NASCAR_Races
             int turnRadius = maxX / 5;
             int pitPosY = maxY / 2 + maxX / 7;
             int turnCurveRadius = 0;
-            //int totalLength = (int)(maxX + 2 * 3.1415 * turnRadius);
-            raceManager = new(straightLength, turnRadius, pitPosY, turnCurveRadius);
+            int totalLength = (int)(maxX + 2 * 3.1415 * turnRadius);
+            raceManager = new(straightLength, turnRadius, pitPosY, turnCurveRadius, mainPictureBox);
             painter = new(maxX, maxY, straightLength, turnRadius, pitPosY);
 
             int numberOfCars = 1;
-            listOfCars = RaceManager.CreateListOfCars(numberOfCars);
+            painter.listOfCars = raceManager.CreateListOfCars(numberOfCars);
 
             programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)
             programTimer.Tick += new EventHandler(RunRace);
@@ -34,12 +33,12 @@ namespace NASCAR_Races
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
             painter.PaintCircuit(e.Graphics);
-            painter.PaintCarsPosition(e.Graphics, listOfCars);
+            painter.PaintCarsPosition(e.Graphics);
         }
 
         internal void RunRace(object sender, EventArgs e)
         {
-            RaceManager.MoveCars(listOfCars);
+            raceManager.MoveCars();
             mainPictureBox.Invalidate();
         }
 
