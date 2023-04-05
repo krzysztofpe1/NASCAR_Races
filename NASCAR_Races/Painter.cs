@@ -56,11 +56,19 @@ namespace NASCAR_Races
             g.DrawLine(_penCircuit, _x1, _canvasHeight / 2 + _turnRadius, _x2 + 1, _canvasHeight / 2 + _turnRadius);
         }
 
-        internal void PaintCarsPosition(Graphics g)
+        public void PaintCarsPosition(Graphics g)
         {
             if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
-            listOfCars.ForEach(car => { g.DrawRectangle(_penCar, car.X-car.Length/2, car.Y-car.Width/2, car.Length, car.Width); });
+            listOfCars.ForEach(car => { PaintCar(g, car); });
         }
-        
+
+        private void PaintCar(Graphics g, Car car)
+        {
+            g.TranslateTransform(car.X, car.Y);
+            g.RotateTransform(car.HeadingAngle);
+            g.TranslateTransform(-car.X, -car.Y);
+            g.DrawRectangle(_penCar, car.X - car.Length / 2, car.Y - car.Width / 2, car.Length, car.Width);
+            g.ResetTransform();
+        }
     }
 }

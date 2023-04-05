@@ -13,7 +13,9 @@ namespace NASCAR_Races
         public float Length { get; private set; } = 15;
         public float Width { get; private set; } = 10;
         public float Speed { get; private set; }
-        public float HeadingAngle { get; private set; }
+        public float HeadingAngle { get; private set; } = 0;
+
+        public bool IsDisposable { get; set; } = false;
 
         private float _weight;
         
@@ -22,8 +24,6 @@ namespace NASCAR_Races
 
         private float _maxSpeed;
         private float _acceleration;
-
-        public bool IsDisposable = false;
 
         public Car() {}
         public Car(float x, float y)
@@ -45,6 +45,7 @@ namespace NASCAR_Races
             while (!IsDisposable)
             {
                 X++;
+                HeadingAngle++;
                 Thread.Sleep(1);
             }
         }
