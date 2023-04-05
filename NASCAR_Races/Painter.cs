@@ -20,7 +20,7 @@ namespace NASCAR_Races
         //Points of start and end of the straights
         public List<Car> listOfCars { set; get; }
         private int _x1, _x2;
-        public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY)
+        public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
         {
             _canvasWidth = canvasWidth;
             _canvasHeight = canvasHeight;
@@ -28,7 +28,7 @@ namespace NASCAR_Races
             _turnRadius = turnRadius;
             _pitPosY = pitPosY;
 
-            _halfPaintBrushSize = 30;
+            _halfPaintBrushSize = penCircuitSize/2;
             _penCircuit = new Pen(Color.Black, _halfPaintBrushSize * 2);
             _penPit = new Pen(Color.Orange, _halfPaintBrushSize);
             _penCar = new Pen(Color.Red, 5);//size of paint brush for car
@@ -37,10 +37,10 @@ namespace NASCAR_Races
         }
         public void PaintCircuit(Graphics g)
         {
-            
+
             //Pen temp1 = new Pen(Color.Orange, _halfPaintBrushSize * 2);
             //Pen temp2 = new Pen(Color.Green, _halfPaintBrushSize * 2);
-            
+
             //Painting Pit Stop
             g.DrawLine(_penPit, _x1, _pitPosY, _x2+1, _pitPosY);
             int startX = _x1 - _turnRadius + _halfPaintBrushSize / 2, startY = _canvasHeight / 2 - _pitPosY / 2;
@@ -59,7 +59,7 @@ namespace NASCAR_Races
         internal void PaintCarsPosition(Graphics g)
         {
             if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
-            listOfCars.ForEach(car => { g.DrawRectangle(_penCar, car.X, car.Y, car.Length, car.Width); });
+            listOfCars.ForEach(car => { g.DrawRectangle(_penCar, car.X-car.Length/2, car.Y-car.Width/2, car.Length, car.Width); });
         }
         
     }

@@ -18,10 +18,11 @@ namespace NASCAR_Races
             int pitPosY = maxY / 2 + maxX / 7;
             int turnCurveRadius = 0;
             int totalLength = (int)(maxX + 2 * 3.1415 * _turnRadius);
-            _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, mainPictureBox);
-            _painter = new(maxX, maxY, straightLength, _turnRadius, pitPosY);
+            int penCircuitSize = 60;
+            _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, penCircuitSize, mainPictureBox);
+            _painter = new(maxX, maxY, straightLength, _turnRadius, pitPosY, penCircuitSize);
 
-            int numberOfCars = 1;
+            int numberOfCars = 5;
             _painter.listOfCars = _raceManager.CreateListOfCars(numberOfCars);
 
             programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)

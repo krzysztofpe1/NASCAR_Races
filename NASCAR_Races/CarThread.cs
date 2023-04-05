@@ -12,6 +12,10 @@ namespace NASCAR_Races
         public CarThread() { }
         public CarThread(Car car) { }
         public CarThread(float x, float y) : base(x, y) { }
+        public CarThread(Point point, float weight, float fuelCapacity) : base(point.X, point.Y, weight, fuelCapacity)
+        {
+            _thread = new(this.Move);
+        }
         public CarThread(float x, float y, float weight, float fuelCapacity) : base(x, y, weight, fuelCapacity)
         {
             _thread = new(this.Move);
@@ -21,7 +25,5 @@ namespace NASCAR_Races
         {
             _thread.Start();
         }
-
-
     }
 }
