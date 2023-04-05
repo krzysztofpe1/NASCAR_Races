@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {}
+    "Y:\\C#\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {}
   },
   "projects": {
-    "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {
+    "Y:\\C#\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
+        "projectUniqueName": "Y:\\C#\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
         "projectName": "NASCAR_Races",
-        "projectPath": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
+        "projectPath": "Y:\\C#\\NASCAR_Races\\NASCAR_Races\\NASCAR_Races.csproj",
         "packagesPath": "C:\\Users\\krzys\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\krzys\\Desktop\\PLIKI\\STUDIA 2022-23 4-sem\\Programowanie Rozproszone\\NASCAR_Races\\NASCAR_Races\\obj\\",
+        "outputPath": "Y:\\C#\\NASCAR_Races\\NASCAR_Races\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\krzys\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

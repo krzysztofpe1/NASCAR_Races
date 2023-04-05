@@ -8,60 +8,48 @@ namespace NASCAR_Races
 {
     public class Car
     {
-        public float weight { get; set; }
-        public float headingAngle;
-        public float x { get; set; }
-        public float y { get; set; }
+        public float X { get; private set; }
+        public float Y { get; private set; }
+        public float Length { get; private set; } = 15;
+        public float Width { get; private set; } = 10;
+        public float Speed { get; private set; }
+        public float HeadingAngle { get; private set; }
 
-        public float length = 10.0f;
-        public float width = 5.0f;
-        public float fuelCapacity;
-        public float fuel { get; set; }
-        public float maxSpeed;
-        public float speed;
-        public float acceleration;
+        private float _weight;
+        
+        private float _fuel;
+        private float _fuelCapacity;
+
+        private float _maxSpeed;
+        private float _acceleration;
+
 
         public Car() {}
 
         public Car(float x, float y)
         {
-            this.x = x;
-            this.y = y;
+            X = x;
+            Y = y;
         }
 
-        public Car(float x, float y, float weight, float headingAngle)
+        public Car(float x, float y, float weight, float fuelCapacity)
         {
-            this.x = x;
-            this.y = y;
-            this.weight = weight;
-            this.headingAngle = headingAngle;
+            X = x;
+            Y = y;
+            _weight = weight;
+            _fuelCapacity = fuelCapacity;
+            _fuel = fuelCapacity;
         }
 
         public void Move()
         {
-            /*// Bot
-            if (car.x < X_MAX && car.x > X_MIN && car.y > Y_MID) car.x += Physics.Street(car.engine.speed);
-
-            // Top
-            if (car.x < X_MAX && car.x > X_MIN && car.y < Y_MID) car.x -= Physics.Street(car.engine.speed);
-
-            // Right
-            if (car.x >= X_MAX)
+            while (true)
             {
-                if (car.y > Y_MID) car.x += Physics.Street(car.engine.speed);
-                else car.x -= Physics.Street(car.engine.speed);
-
-                car.y -= Physics.Street(car.engine.speed);
+                X++;
+                Thread.Sleep(1);
             }
-
-            // Left
-            if (car.x <= X_MIN)
-            {
-                if (car.y > Y_MID) car.x += Physics.Street(car.engine.speed);
-                else car.x -= Physics.Street(car.engine.speed);
-
-                car.y += Physics.Street(car.engine.speed);
-            }*/
         }
+
+
     }
 }
