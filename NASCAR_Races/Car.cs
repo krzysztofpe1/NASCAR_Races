@@ -8,12 +8,20 @@ namespace NASCAR_Races
 {
     public class Car
     {
+        public enum STATE
+        {
+            ON_CIRCUIT,
+            OFF_CIRCUIT,
+            ON_WAY_TO_PIT_STOP,
+            PIT_STOP
+        }
         public float X { get; private set; }
         public float Y { get; private set; }
         public float Length { get; private set; } = 15;
         public float Width { get; private set; } = 10;
         public float Speed { get; private set; }
         public float HeadingAngle { get; private set; } = 0;
+        public STATE State { get; private set; } = Car.STATE.ON_CIRCUIT;
 
         public bool IsDisposable { get; set; } = false;
 
@@ -40,12 +48,16 @@ namespace NASCAR_Races
             _fuel = fuelCapacity;
         }
 
+        Random random = new();
         public void Move()
         {
             while (!IsDisposable)
             {
-                X++;
-                HeadingAngle++;
+                if (random.Next(2) == 0)
+                {
+                    X++;
+                    HeadingAngle++;
+                }
                 Thread.Sleep(1);
             }
         }

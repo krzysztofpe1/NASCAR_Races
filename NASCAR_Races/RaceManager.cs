@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,9 @@ namespace NASCAR_Races
         private Point _nextStartingPos;
         private int _firstRow;
         private int _secondRow;
+
+        private Thread _thread;
+        private bool _killCollisionChecker = false;
         
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, PictureBox mainPictureBox)
         {
@@ -40,6 +44,8 @@ namespace NASCAR_Races
             _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 4;
             _nextStartingPos.X = _canvasWidth / 2 + straightLength / 4;
             _nextStartingPos.Y = _firstRow;
+
+            _thread = new(CheckCollisions);
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -55,6 +61,27 @@ namespace NASCAR_Races
             return ListOfCars;
         }
 
+        private void CheckCollisions()
+        {
+            while (!_killCollisionChecker)
+            {
+                foreach (Car car1 in ListOfCars)
+                {
+                    if (car1.State != Car.STATE.ON_CIRCUIT && car1.State != Car.STATE.ON_WAY_TO_PIT_STOP) continue;
+                    foreach (Car car2 in ListOfCars)
+                    {
+                        if (car1 == car2) continue;
+                        if (car2.State != Car.STATE.ON_CIRCUIT && (car2.State != Car.STATE.ON_WAY_TO_PIT_STOP)) continue;
+                        if (Math.Abs(car1.X - car2.X) < car1.Length / 2 + car2.Length / 2 && Math.Abs(car1.Y - car2.Y) < car1.Width / 2 + car2.Width / 2)
+                        {
+                            car1.IsDisposable = true;
+                            car2.IsDisposable = true;
+                        }
+                    }
+                }
+            }
+        }
+
         private Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
@@ -66,10 +93,12 @@ namespace NASCAR_Races
         public void StartRace()
         {
             ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
+            _thread.Start();
         }
 
         public void KillThreads()
         {
+            _killCollisionChecker = true;
             ListOfCarThreads.ForEach(carThread => { carThread.Kill(); });
         }
     }
