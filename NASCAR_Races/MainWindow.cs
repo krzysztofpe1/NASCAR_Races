@@ -29,6 +29,7 @@ namespace NASCAR_Races
             programTimer.Tick += new EventHandler(RunRace);
             programTimer.Start();
             _raceManager.StartRace();
+            this.FormClosing += MainWindowClosing_KillThreads;
         }
 
         //metoda odœwie¿ania ekranu, wywo³ywana automatycznie, gdy system uwa¿a, ¿e nale¿y j¹ wywo³aæ.
@@ -39,9 +40,14 @@ namespace NASCAR_Races
             _painter.PaintCarsPosition(e.Graphics);
         }
 
-        internal void RunRace(object sender, EventArgs e)
+        private void RunRace(object sender, EventArgs e)
         {
             mainPictureBox.Invalidate();
+        }
+
+        private void MainWindowClosing_KillThreads(object sender, FormClosingEventArgs e)
+        {
+            _raceManager.KillThreads();
         }
 
     }

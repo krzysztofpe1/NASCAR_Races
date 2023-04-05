@@ -25,5 +25,9 @@ namespace NASCAR_Races
         {
             _thread.Start();
         }
+        public void Kill()
+        {
+            IsDisposable = true;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace NASCAR_Races
 
         private int _canvasWidth;
         private int _canvasHeight;
-        private int _penCircuitSize;
+        //private int _penCircuitSize;
 
         private int _straightLength;
         private int _turnRadius;
@@ -28,7 +28,7 @@ namespace NASCAR_Races
         {
             _canvasWidth = mainPictureBox.Width;
             _canvasHeight = mainPictureBox.Height;
-            _penCircuitSize = penCircuitSize;
+            //_penCircuitSize = penCircuitSize;
 
             _straightLength = straightLength;
             _turnRadius = turnRadius;
@@ -66,6 +66,11 @@ namespace NASCAR_Races
         public void StartRace()
         {
             ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
+        }
+
+        public void KillThreads()
+        {
+            ListOfCarThreads.ForEach(carThread => { carThread.Kill(); });
         }
     }
 }

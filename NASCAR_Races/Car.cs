@@ -23,6 +23,8 @@ namespace NASCAR_Races
         private float _maxSpeed;
         private float _acceleration;
 
+        public bool IsDisposable = false;
+
         public Car() {}
         public Car(float x, float y)
         {
@@ -40,7 +42,7 @@ namespace NASCAR_Races
 
         public void Move()
         {
-            while (true)
+            while (!IsDisposable)
             {
                 X++;
                 Thread.Sleep(1);
