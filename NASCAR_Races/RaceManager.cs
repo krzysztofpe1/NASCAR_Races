@@ -12,8 +12,8 @@ namespace NASCAR_Races
         private int _turnRadius;
         private int _pitPosY;
         private int turnCurveRadius;
-        public List<CarThread> listOfCarThreads;
-        public List<Car> listOfCars;
+        public List<CarThread> ListOfCarThreads;
+        public List<Car> ListOfCars;
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, PictureBox mainPictureBox)
         {
             _straightLength = straightLength;
@@ -24,20 +24,20 @@ namespace NASCAR_Races
 
         public List<Car> CreateListOfCars(int numberOfCars)
         {
-            listOfCarThreads = new List<CarThread>();
-            listOfCars=new List<Car>();
+            ListOfCarThreads = new List<CarThread>();
+            ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
                 CarThread car = new(570, 550, 1000, 70);
-                listOfCarThreads.Add(car);
-                listOfCars.Add((Car)car);
+                ListOfCarThreads.Add(car);
+                ListOfCars.Add((Car)car);
             }
-            return listOfCars;
+            return ListOfCars;
         }
 
         public void StartRace()
         {
-            listOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
+            ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
         }
     }
 }

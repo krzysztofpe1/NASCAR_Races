@@ -23,15 +23,12 @@ namespace NASCAR_Races
         private float _maxSpeed;
         private float _acceleration;
 
-
         public Car() {}
-
         public Car(float x, float y)
         {
             X = x;
             Y = y;
         }
-
         public Car(float x, float y, float weight, float fuelCapacity)
         {
             X = x;
