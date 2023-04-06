@@ -8,7 +8,8 @@ namespace NASCAR_Races
 {
     public class Painter
     {
-        private int _canvasWidth, _canvasHeight;
+        private int _canvasWidth;
+        private int _canvasHeight;
 
         private int _straightLength;
         private int _turnRadius;

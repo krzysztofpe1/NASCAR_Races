@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NASCAR_Races
 {
-    public class Car
+    public class Car : CarController
     {
         public enum STATE
         {
@@ -15,12 +15,10 @@ namespace NASCAR_Races
             ON_WAY_TO_PIT_STOP,
             PIT_STOP
         }
-        public float X { get; private set; }
-        public float Y { get; private set; }
-        public float Length { get; private set; } = 15;
-        public float Width { get; private set; } = 10;
-        public float Speed { get; private set; }
-        public float HeadingAngle { get; private set; } = 0;
+
+        private int _canvasWidth;
+        private int _canvasHeight;
+        
         public STATE State { get; private set; } = Car.STATE.ON_CIRCUIT;
 
         public bool IsDisposable { get; set; } = false;
@@ -33,19 +31,24 @@ namespace NASCAR_Races
         private float _maxSpeed;
         private float _acceleration;
 
+        private Worldinformation _world;
+
         public Car() {}
         public Car(float x, float y)
         {
             X = x;
             Y = y;
         }
-        public Car(float x, float y, float weight, float fuelCapacity)
+        //TODO
+        //zaimplementowac klase swiat z wszystkimi wymiarami
+        public Car(float x, float y, float weight, float fuelCapacity, Worldinformation worldInfo)
         {
             X = x;
             Y = y;
             _weight = weight;
             _fuelCapacity = fuelCapacity;
             _fuel = fuelCapacity;
+            _world = worldInfo;
         }
 
         Random random = new();
@@ -53,12 +56,7 @@ namespace NASCAR_Races
         {
             while (!IsDisposable)
             {
-                if (random.Next(2) == 0)
-                {
-                    X++;
-                    HeadingAngle++;
-                }
-                Thread.Sleep(1);
+                
             }
         }
 
