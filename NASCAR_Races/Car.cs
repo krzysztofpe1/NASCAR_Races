@@ -28,6 +28,7 @@ namespace NASCAR_Races
         private float _fuel;
         private float _fuelCapacity;
 
+        private float _horsePower;
         private float _maxSpeed;
         private float _acceleration;
 
