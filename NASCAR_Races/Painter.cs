@@ -21,6 +21,8 @@ namespace NASCAR_Races
         //Points of start and end of the straights
         public List<Car> listOfCars { set; get; }
         private int _x1, _x2;
+
+        private Worldinformation _worldinformation;
         public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
         {
             _canvasWidth = canvasWidth;
