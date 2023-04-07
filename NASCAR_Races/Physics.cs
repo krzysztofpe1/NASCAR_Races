@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+
 namespace NASCAR_Races
 {
     public class Physics
@@ -8,54 +10,65 @@ namespace NASCAR_Races
         const float airDensity = 1.225f;
         const float frontSurface = 2.5f;
         const float carAirDynamic = 0.35f;
+        const float RadiusOfTurn = 90;
 
 
-        private float currentAcceleration;
-        private float mass;
-        private float currentHorsePower = 4000; // Force should be in the Future
-        private float radiusofCar;
-        private float radiusofWells;
-        private float frictionofweels;
-        private float radiusCar = 0;
-        private float fuelMass;
+        private float _currentAcceleration;
+        private float _mass;
+        private float _currentHorsePower = 4000; // Force should be in the Future
+        private float _radiusofCar;
+        private float _radiusofWells;
+        private float _frictionofweels;
+        private float _radiusCar = 0;
+        private float _fuelMass;
+        private System.DateTime _lastExecutionTime;
 
-        protected float fuelBurningRatio = 0.5f;
-        protected float acceleration = 0;
-        protected float speed = 0;
-        protected System.DateTime timeFromStart;
-        protected DateTime timecurrnet;
+        protected float FuelBurningRatio = 0.5f;
+        protected float Speed = 0;
+
 
         public Physics() { }
         public Physics(float Basemass, float frictionofweels, float fuelMass)
         {
-            timeFromStart = DateTime.Now;
-            this.fuelMass = fuelMass;
-            this.mass = Basemass;
-            this.frictionofweels = frictionofweels;
+            this._lastExecutionTime = DateTime.Now;
+            this._fuelMass = fuelMass;
+            this._mass = Basemass;
+            this._frictionofweels = frictionofweels;
         }
 
-        public static Tuple<double, double> MoveCarOnCircle(double a, double b, double r, double speed, double timeElapsed)
+        public void MoveCarOnCircle(float a, float b, float r, float timeElapsed)
         {
+            //distanceToEndOfTheTrack = positionofcar - positionofBorder
+            // r = radiusofTurn + distanceToEndOfTheTrack
             // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
-            double newAngle = speed * timeElapsed / r;
+
+
+            float newAngle = Speed * timeElapsed / r;
 
             // Wyznaczamy nowe współrzędne X i Y samochodu
-            double x = a + r * Math.Cos(newAngle);
-            double y = b + r * Math.Sin(newAngle);
+            float x = a + r * (float)Math.Cos(newAngle);
+            float y = b + r * (float)Math.Sin(newAngle);
 
-            return new Tuple<double, double>(x, y);
+            //return new Tuple<float, float>(x, y);
         }
         // Run in the loop
         public void RunPhysic()
         {
-            //timecurrnet 
+            DateTime currentTime = DateTime.Now;
+            TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
+            this._lastExecutionTime = currentTime;
+
             float AirR = AirResistance();
-            float FF = FrictionForce();
+            float FF = FrictionForce(); // siła która przeciwdziała sile dośrodkowej
             float wheelFriction = 60;
-            this.acceleration = Acceleration() - AirR - wheelFriction;
-            if (Acceleration() < AirR + wheelFriction) this.acceleration = 0;
-            this.speed += acceleration/mass; // * time
-            this.fuelMass -= this.currentHorsePower * fuelBurningRatio; // * time
+            this._currentAcceleration = Acceleration() - AirR - wheelFriction;
+            if (Acceleration() < AirR + wheelFriction) this._currentAcceleration = 0;
+            this.Speed += _currentAcceleration / _mass; // * time
+            this._fuelMass -= this._currentHorsePower * FuelBurningRatio; // * time
+        }
+        public void ConvertSpeedToVectors()
+        {
+
         }
         //sila odsrodkowa
         public float CentrifugalForce(float speed, float radius, float mass)
@@ -65,18 +78,18 @@ namespace NASCAR_Races
         //siła tarcia
         public float FrictionForce()
         {
-            return (float)(mass * frictionofweels * accelerationOfGravity);
+            return (float)(_mass * _frictionofweels * accelerationOfGravity);
             //To DO include trackAngle  * this.trackAngle
         }
         //Opór powietrza
         public float AirResistance()
         {
-            return (float)(0.5 * airDensity * (float)Math.Pow(speed, 2) * carAirDynamic * frontSurface);
+            return (float)(0.5 * airDensity * (float)Math.Pow(Speed, 2) * carAirDynamic * frontSurface);
         }
         // ile samochód się oddala/przybliża do środka
         private float Acceleration()
         {
-            return this.currentHorsePower;
+            return this._currentHorsePower;
         }
 
         public float IscentrifugalForceEffectig(float speed, float radiusCar, float radiusOfWells, float mass, float frictionOfWeels)
