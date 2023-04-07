@@ -23,5 +23,10 @@ namespace NASCAR_Races
             TurnCurveRadius = turnCurveRadius;
             PitPosY = pitPosY;
         }
+
+        public void IsInBoundsOfCircuit(Car car)
+        {
+
+        }
     }
 }

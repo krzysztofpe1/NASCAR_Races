@@ -9,14 +9,11 @@ namespace NASCAR_Races
     public class CarThread : Car
     {
         private Thread _thread;
-        public CarThread() { }
-        public CarThread(Car car) { }
-        public CarThread(float x, float y) : base(x, y) { }
-        public CarThread(Point point, float weight, float fuelCapacity) : base(point.X, point.Y, weight, fuelCapacity)
+        public CarThread(Point point, float weight, float fuelCapacity, Worldinformation worldinformation) : base(point.X, point.Y, weight, fuelCapacity, worldinformation)
         {
             _thread = new(this.Move);
         }
-        public CarThread(float x, float y, float weight, float fuelCapacity) : base(x, y, weight, fuelCapacity)
+        public CarThread(float x, float y, float weight, float fuelCapacity, Worldinformation worldinformation) : base(x, y, weight, fuelCapacity, worldinformation)
         {
             _thread = new(this.Move);
         }
