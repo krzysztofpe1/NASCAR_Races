@@ -9,9 +9,6 @@ namespace NASCAR_Races
         public float Y { get; set; }
         public float Speed { get; private set; } = 0;
         public float HeadingAngle { get; set; } = 0;
-        
-
-
 
         const float accelerationOfGravity = 9.81f;
         const float trackAngle = 10;
@@ -40,6 +37,8 @@ namespace NASCAR_Races
 
         private double currentTurnAngle = -Math.PI / 2;
 
+        private Worldinformation _worldInf;
+
         public Physics() { }
         public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, Worldinformation worldInfo)
         {
@@ -53,6 +52,8 @@ namespace NASCAR_Races
             FuelCapacity = fuelCapacity;
             _frictionofweels = frictionofweels;
             _lastExecutionTime = DateTime.Now;
+
+            _worldInf = worldInfo;
         }
         // Run in the loop
         public void RunPhysic()
@@ -66,44 +67,56 @@ namespace NASCAR_Races
             //_currentAcceleration = Acceleration() - AirR - wheelFriction;
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //Speed += _currentAcceleration / _mass; // * time
-            Speed = 40f;
+            Speed = 140f;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
             
-            if (X >= _rightCircle.X)
+            if (X > _rightCircle.X)
             {
-                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true);
+                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightCircle);
+            }
+            else if(X < _leftCircle.X)
+            {
+                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _leftCircle);
             }
             //dodac else if dla lewego okregu
             else
             {
-                X++;
+                if (Y <= _worldInf.CanvasHeight / 2)
+                    X -= Speed * (float)timeSinceLastExecution.TotalSeconds;
+                else
+                    X += Speed * (float)timeSinceLastExecution.TotalSeconds;
             }
 
             _lastExecutionTime = currentTime;
         }
 
-        private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll)
+        private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll,Point circle)
         {
             //distanceToEndOfTheTrack = positionofcar - positionofBorder
-            // r = radiusofTurn + distanceToEndOfTheTrack
+            float r = DistanceFromPointToPoint(X, Y, circle.X, circle.Y);
             // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
             float a=0, b=0;
             if(rightCircleControll)
             {
-                a= _rightCircle.X;
-                b= _rightCircle.Y;
+                a= circle.X;
+                b= circle.Y;
             }
 
-            currentTurnAngle += Speed *timeElapsed/ _turnRadius;
+            currentTurnAngle += Speed *timeElapsed/ r;
             // Wyznaczamy nowe współrzędne X i Y samochodu
-            X = a + _turnRadius * (float)Math.Cos(-currentTurnAngle);
-            Y = b + _turnRadius * (float)Math.Sin(-currentTurnAngle);
+            X = a + r * (float)Math.Cos(-currentTurnAngle);
+            Y = b + r * (float)Math.Sin(-currentTurnAngle);
 
             //return new Tuple<float, float>(x, y);
         }
         
         public void ConvertSpeedToVectors()
         {
+
+        }
+        public float DistanceFromPointToPoint(float x1,float y1, float x2, float y2)
+        {
+            return (float)Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
 
         }
         //sila odsrodkowa
