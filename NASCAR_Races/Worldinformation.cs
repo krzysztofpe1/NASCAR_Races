@@ -16,6 +16,8 @@ namespace NASCAR_Races
         public int PitPosY { get; }
         public Point OuterBounds { get; }
         public Point InnerBounds { get; }
+        public int PenCircuitSize { get; }
+
         public int x1;
         public int x2;
 
@@ -27,7 +29,7 @@ namespace NASCAR_Races
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
         }
-        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, PictureBox mainPictureBox)
+        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
@@ -40,6 +42,7 @@ namespace NASCAR_Races
             x2 = CanvasWidth / 2 + straightLength / 2;
             LeftCircle = new Point(x1, CanvasHeight / 2);
             RightCircle = new Point(x2, CanvasHeight / 2);
+            PenCircuitSize = penCircuitSize;
         }
 
         public bool IsInBoundsOfCircuit(Car car)
@@ -49,6 +52,24 @@ namespace NASCAR_Races
         public bool IsInBoundsOfCircuit(float x, float y)
         {
             return false;
+        }
+        public List<Point> PerfectTurnCirclePoints(bool rightCircle = true)
+        {
+            List<Point> points = new List<Point>();
+            if(rightCircle)
+            {
+                points.Add(new Point(x2, CanvasHeight / 2 + TurnRadius + PenCircuitSize / 2 - PenCircuitSize / 4));//dol
+                points.Add(new Point(x2, CanvasHeight / 2 - TurnRadius - PenCircuitSize / 2 + PenCircuitSize / 4));//gora
+                points.Add(new Point(x2 + TurnRadius - PenCircuitSize / 2, CanvasHeight / 2 + PenCircuitSize / 4));//prawo
+            }
+            else
+            {
+                points.Add(new Point(x1, CanvasHeight / 2 + TurnRadius + PenCircuitSize / 2 - PenCircuitSize / 4));//dol
+                points.Add(new Point(x1, CanvasHeight / 2 - TurnRadius - PenCircuitSize / 2 + PenCircuitSize / 4));//gora
+                points.Add(new Point(x1 - TurnRadius + PenCircuitSize / 2, CanvasHeight / 2 - PenCircuitSize / 4));//lewo
+            }
+
+            return points;
         }
     }
 }

@@ -49,7 +49,7 @@ namespace NASCAR_Races
 
             _thread = new(CheckCollisions);
 
-            Worldinformation= new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, mainPictureBox);
+            Worldinformation= new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, mainPictureBox);
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -97,7 +97,7 @@ namespace NASCAR_Races
         public void StartRace()
         {
             ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
-            _thread.Start();
+            //_thread.Start();
         }
 
         public void KillThreads()
