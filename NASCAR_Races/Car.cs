@@ -116,22 +116,6 @@ namespace NASCAR_Races
                 Thread.Sleep(10);
             }
         }
-        //works only on straights
-        public Point FrontLeftCorner()
-        {
-            //TODO
-            //wprowadzic jakis mechanizm ktory dokona kalkulacji gdzie dokladnie znajduje sie rog; wykorzystac HeadingAngle podany w STOPPNIACH NIE RADIANACH
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.TOP) return new Point((int)(X - Length / 2), (int)(Y + Width / 2));
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.BOTTOM) return new Point((int)(X + Length / 2), (int)(Y - Width / 2));
-            return new Point();
-        }
-        //works only on straights
-        public Point ReadRightCorner()
-        {
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.TOP) return new Point((int)(X + Length / 2), (int)(Y - Width / 2));
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.BOTTOM) return new Point((int)(X - Length / 2), (int)(Y + Width / 2));
-            return new Point();
-        }
         //return true if there is at least one opponent on the left side
         private bool AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS partOfCircuit)
         {
