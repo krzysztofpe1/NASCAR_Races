@@ -58,7 +58,7 @@ namespace NASCAR_Races
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), 1000, 70, Worldinformation);
+                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }

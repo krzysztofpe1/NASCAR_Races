@@ -22,12 +22,13 @@ namespace NASCAR_Races
         private float _frictionofweels;
         private System.DateTime _lastExecutionTime;
 
-        private Point _leftCircle;
-        private Point _rightCircle;
+        protected Point _leftCircle { get; set; }
+        protected Point _rightCircle { get; set; }
+        protected int _circleRadius { get; set; }
 
-        private Point _leftPerfectCircle;
-        private Point _rightPerfectCircle;
-        private int _perfectCircleRadius;
+        protected Point _leftPerfectCircle { get; }
+        protected Point _rightPerfectCircle { get; }
+        protected int _perfectCircleRadius { get; }
 
         private float _turnRadius;
         private float _UseOftires = 0.5f;
@@ -56,8 +57,6 @@ namespace NASCAR_Races
             X= x;
             Y= y;
             _mass = mass;
-            _leftCircle = worldInfo.LeftCircle;
-            _rightCircle = worldInfo.RightCircle;
             _turnRadius = worldInfo.TurnRadius;
             FuelMass = fuelCapacity;
             FuelCapacity = fuelCapacity;
@@ -69,10 +68,13 @@ namespace NASCAR_Races
             List<Point>temp = worldInfo.PerfectTurnCirclePoints(false);
             List<double> temp2 = FindCircle(temp);
             _leftPerfectCircle = new Point((int)temp2[0], (int)temp2[1]);
+            _leftCircle = _leftPerfectCircle;
             _perfectCircleRadius = (int)temp2[2];
+            _circleRadius = _perfectCircleRadius;
             temp = worldInfo.PerfectTurnCirclePoints();
             temp2 = FindCircle(temp);
             _rightPerfectCircle=new Point((int)temp2[0], (int)temp2[1]);
+            _rightCircle = _rightPerfectCircle;
         }
         // Run in the loop
         public void RunPhysic()
@@ -89,18 +91,17 @@ namespace NASCAR_Races
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
 
-            if (X > _rightPerfectCircle.X)
+            if (X > _rightCircle.X)
             {
-                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightPerfectCircle);
+                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightCircle);
             }
-            else if(X < _leftPerfectCircle.X)
+            else if(X < _leftCircle.X)
             {
-                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _leftPerfectCircle);
+                MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _leftCircle);
             }
-            //dodac else if dla lewego okregu
             else
             {
-                if (Y <= _worldInf.CanvasHeight / 2)
+                if (Y <= _worldInf.CanvasCenterY)
                 {
                     X -= Speed * (float)timeSinceLastExecution.TotalSeconds;
                     HeadingAngle = 0;
@@ -135,7 +136,7 @@ namespace NASCAR_Races
         {
             //distanceToEndOfTheTrack = positionofcar - positionofBorder
             //float r = DistanceFromPointToPoint(X, Y, circle.X, circle.Y);
-            float r = _perfectCircleRadius;
+            float r = _circleRadius;
 
             // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
             float a=0, b=0;
@@ -216,11 +217,17 @@ namespace NASCAR_Races
                     return frictionAll - XFroce;
             }
         }
-        private List<double> FindCircle(List<Point> points)
+        public static List<double> FindCircle(List<Point> points)
         {
-            return FindCircle(points[0].X, points[0].Y, points[1].X, points[1].Y, points[2].X, points[2].Y);
+            if(points.Count == 3)
+                return FindCircle(points[0].X, points[0].Y, points[1].X, points[1].Y, points[2].X, points[2].Y);
+            return FindCircle(points[0].X, points[0].Y, points[1].X, points[1].Y);
         }
-        private List<double> FindCircle(int x1, int y1,
+        //returns List where:
+        //List[0] - X coordinate of Circle Center
+        //List[1] - Y coordinate of Circle Center
+        //List[2] - Radius of Circle
+        private static List<double> FindCircle(int x1, int y1,
                                         int x2, int y2,
                                         int x3, int y3)
         {
@@ -279,6 +286,19 @@ namespace NASCAR_Races
             result.Add(k);
             result.Add(r);
             return result;
+        }
+        //works only when x1=x2
+        protected static List<double> FindCircle(int x1, int y1,
+                                        int x2, int y2)
+        {
+            double centerX = x1;
+            double centerY = (y1 + y2) / 2.0;
+            double radius = Math.Abs(y1 - y2) / 2.0;
+            List<double> res = new List<double>();
+            res.Add(centerX);
+            res.Add(centerY);
+            res.Add(radius);
+            return res;
         }
     }
 }
