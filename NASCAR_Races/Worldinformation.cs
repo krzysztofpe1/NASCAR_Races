@@ -75,12 +75,17 @@ namespace NASCAR_Races
             BOTTOM,
             PIT
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car, bool perfectCircle = true)
         {
-            return WhatPartOfCircuitIsCarOn(car.X, car.Y);
+            return WhatPartOfCircuitIsCarOn(car.X, car.Y, perfectCircle);
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(float x, float y)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(float x, float y, bool perfectCircle)
         {
+            if (!perfectCircle)
+            {
+                if (x < x1) return CIRCUIT_PARTS.LEFT_TURN;
+                if (x > x2) return CIRCUIT_PARTS.RIGHT_TURN;
+            }
             if (x < LeftPerfectCircle.X) return CIRCUIT_PARTS.LEFT_TURN;
             if (x > RightPerfectCircle.X) return CIRCUIT_PARTS.RIGHT_TURN;
             if (y < CanvasCenterY) return CIRCUIT_PARTS.TOP;

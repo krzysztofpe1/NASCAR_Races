@@ -30,6 +30,8 @@ namespace NASCAR_Races
         protected Point _rightPerfectCircle { get; }
         protected int _perfectCircleRadius { get; }
 
+        protected bool _perfectCircle { get; set; }
+
         private float _turnRadius;
         private float _UseOftires = 0.5f;
 
@@ -101,33 +103,34 @@ namespace NASCAR_Races
             }
             else
             {
-                if (Y <= _worldInf.CanvasCenterY)
+                MoveCarOnStraight((float)timeSinceLastExecution.TotalSeconds);
+                /*if (Y <= _worldInf.CanvasCenterY)
                 {
                     X -= Speed * (float)timeSinceLastExecution.TotalSeconds;
                     HeadingAngle = 0;
-                    /*
-                    if(X - _leftPerfectCircle.X<=10 && (IscentrifugalForce(IscentrifugalForce(_perfectCircleRadius)) != 0))
+
+                    if (X - _leftPerfectCircle.X <= 10 && (IscentrifugalForce(IscentrifugalForce(_perfectCircleRadius)) != 0))
                     {
                         //_currentAcceleration -= (BrakingForce()/_mass);
                         CurrentHorsePower = 0;
                     }
                     else { CurrentHorsePower = 55560; }
-                    */
+
                 }
                 else
                 {
                     X += Speed * (float)timeSinceLastExecution.TotalSeconds;
                     HeadingAngle = 180;
-                    /*
+
                     if (X - _rightPerfectCircle.X <= 10 && (IscentrifugalForce(IscentrifugalForce(_perfectCircleRadius)) != 0))
                     {
                         //_currentAcceleration -= (BrakingForce() / _mass);
                         CurrentHorsePower = 0;
                     }
                     else { CurrentHorsePower = 55560; }
-                    */
-                    
-                }
+
+
+                }*/
             }
 
             _lastExecutionTime = currentTime;
@@ -153,6 +156,33 @@ namespace NASCAR_Races
             Y = b + r * (float)Math.Sin(-currentTurnAngle);
 
             //return new Tuple<float, float>(x, y);
+        }
+        private void MoveCarOnStraight(float timeElapsed)
+        {
+            if (Y < _worldInf.CanvasCenterY)
+            {
+                //TOP
+                X -= Speed * timeElapsed;
+                HeadingAngle = 0;
+                int enteringPoint = _leftCircle.Y - _circleRadius;
+                if (Y != enteringPoint)
+                {
+                    Y = (Y < enteringPoint) ? Y += 0.3f : Y -= 0.3f;
+                    if(Math.Abs(Y-enteringPoint)<0.3)Y=enteringPoint;
+                }
+            }
+            else
+            {
+                //BOTTOM
+                X += Speed * timeElapsed;
+                HeadingAngle = 180;
+                int enteringPoint = _rightCircle.Y + _circleRadius;
+                if (Y != enteringPoint)
+                {
+                    Y = (Y < enteringPoint) ? Y += 0.1f : Y -= 0.1f;
+                    if(Math.Abs(Y-enteringPoint)<0.3)Y=enteringPoint;
+                }
+            }
         }
         
         public void ConvertSpeedToVectors()

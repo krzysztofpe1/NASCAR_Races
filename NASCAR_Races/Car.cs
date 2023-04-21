@@ -53,7 +53,7 @@ namespace NASCAR_Races
                         //TODO
                         //obliczanie kola po jakim auto musi przejechac, zeby nie uderzyc w inne auto
                         List<Double> points = new List<Double>();
-                        switch (_worldInfo.WhatPartOfCircuitIsCarOn(this))
+                        switch (_worldInfo.WhatPartOfCircuitIsCarOn(this, _perfectCircle))
                         {
                             case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
 
@@ -68,6 +68,7 @@ namespace NASCAR_Races
                                 //tym samym, czy musi zjechac do pitu
                                 if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.TOP))
                                 {
+                                    _perfectCircle = false;
                                     points = FindCircle(_worldInfo.x1, (int)Y,
                                                         _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)));
                                     _leftCircle = new Point((int)points[0], (int)points[1]);
@@ -75,6 +76,7 @@ namespace NASCAR_Races
                                 }
                                 else
                                 {
+                                    _perfectCircle = true;
                                     _leftCircle = _leftPerfectCircle;
                                     _rightCircle = _rightPerfectCircle;
                                     _circleRadius = _perfectCircleRadius;
@@ -84,6 +86,7 @@ namespace NASCAR_Races
                                 //Car will enter "right" turn
                                 if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.BOTTOM))
                                 {
+                                    _perfectCircle = false;
                                     points = FindCircle(_worldInfo.x2, (int)Y,
                                                         _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)));
                                     _rightCircle= new Point((int)points[0], (int)points[1]);
@@ -91,6 +94,7 @@ namespace NASCAR_Races
                                 }
                                 else
                                 {
+                                    _perfectCircle = true;
                                     _leftCircle = _leftPerfectCircle;
                                     _rightCircle = _rightPerfectCircle;
                                     _circleRadius = _perfectCircleRadius;
@@ -103,9 +107,10 @@ namespace NASCAR_Races
                     }
                     else
                     {
-                        Worldinformation.CIRCUIT_PARTS partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this);
+                        Worldinformation.CIRCUIT_PARTS partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this, _perfectCircle);
                         if (partOfCircuit != Worldinformation.CIRCUIT_PARTS.LEFT_TURN && partOfCircuit != Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
                         {
+                            _perfectCircle = true;
                             _leftCircle = _leftPerfectCircle;
                             _rightCircle = _rightPerfectCircle;
                             _circleRadius = _perfectCircleRadius;
