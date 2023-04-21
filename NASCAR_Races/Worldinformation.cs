@@ -17,19 +17,21 @@ namespace NASCAR_Races
         public Point OuterBounds { get; }
         public Point InnerBounds { get; }
         public int PenCircuitSize { get; }
+        public int CarViewingRadius { get; }
 
         public int x1;
         public int x2;
 
         public Point LeftCircle;
         public Point RightCircle;
+        public List<Car> ListOfCars { get; set; }
 
         public Worldinformation(PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
         }
-        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, PictureBox mainPictureBox)
+        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int carViewingRadius, PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
@@ -43,7 +45,23 @@ namespace NASCAR_Races
             LeftCircle = new Point(x1, CanvasHeight / 2);
             RightCircle = new Point(x2, CanvasHeight / 2);
             PenCircuitSize = penCircuitSize;
+            CarViewingRadius = carViewingRadius;
         }
+
+        //returns List<Car> that are in CarViewingRadius of callerCar
+        public List<Car> NearbyCars(Car callerCar)
+        {
+            List<Car> res = new List<Car>();
+            ListOfCars.ForEach(car =>
+            {
+                if (callerCar!=car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2))
+                {
+                    res.Add(car);
+                }
+            });
+            return res;
+        }
+
 
         public bool IsInBoundsOfCircuit(Car car)
         {

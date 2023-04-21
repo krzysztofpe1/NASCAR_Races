@@ -28,7 +28,7 @@ namespace NASCAR_Races
         private Thread _thread;
         private bool _killCollisionChecker = false;
 
-        private Worldinformation Worldinformation;
+        public Worldinformation Worldinformation { get; }
         
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, PictureBox mainPictureBox)
         {
@@ -49,7 +49,7 @@ namespace NASCAR_Races
 
             _thread = new(CheckCollisions);
 
-            Worldinformation= new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, mainPictureBox);
+            Worldinformation= new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, 50, mainPictureBox);
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -62,6 +62,7 @@ namespace NASCAR_Races
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
+            Worldinformation.ListOfCars= ListOfCars;
             return ListOfCars;
         }
 

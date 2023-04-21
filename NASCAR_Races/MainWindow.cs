@@ -20,8 +20,8 @@ namespace NASCAR_Races
             int totalLength = (int)(maxX + 2 * 3.1415 * _turnRadius);
             int penCircuitSize = 60;
             _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, penCircuitSize, mainPictureBox);
-            _painter = new(maxX, maxY, straightLength, _turnRadius, pitPosY, penCircuitSize);
-
+            _painter = new(_raceManager.Worldinformation);
+            
             int numberOfCars = 5;
             _painter.listOfCars = _raceManager.CreateListOfCars(numberOfCars);
 

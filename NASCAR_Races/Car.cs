@@ -23,6 +23,7 @@ namespace NASCAR_Races
         
         public float Length { get; private set; } = 15;
         public float Width { get; private set; } = 10;
+        private List<Car> _neighbouringCars;
         
         
 
@@ -36,8 +37,16 @@ namespace NASCAR_Races
         Random random = new Random();
         public void Move()
         {
+            _neighbouringCars = _worldInfo.NearbyCars(this);
+            int counter = 0;
             while (!IsDisposable)
             {
+                //refreshing neighbouring cars list every 10 iterations
+                if (++counter >= 10)
+                {
+                    counter = 0;
+                    _neighbouringCars = _worldInfo.NearbyCars(this);
+                }
                 RunPhysic();
                 Thread.Sleep(10);
             }

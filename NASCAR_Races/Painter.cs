@@ -23,6 +23,19 @@ namespace NASCAR_Races
         private int _x1, _x2;
 
         private Worldinformation _worldinformation;
+        public Painter(Worldinformation worldinformation)
+        {
+            _canvasHeight = worldinformation.CanvasHeight;
+            _canvasWidth = worldinformation.CanvasWidth;
+            _straightLength = worldinformation.StraightLength;
+            _turnRadius = worldinformation.TurnRadius;
+            _pitPosY = worldinformation.PitPosY;
+            _penCircuit = new Pen(Color.Black, worldinformation.PenCircuitSize);
+            _penPit = new Pen(Color.Orange, worldinformation.PenCircuitSize);
+            _penCar = new Pen(Color.Red, 5);
+            _x1 = _canvasWidth / 2 - _straightLength / 2;
+            _x2 = _canvasWidth / 2 + _straightLength / 2;
+        }
         public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
         {
             _canvasWidth = canvasWidth;
