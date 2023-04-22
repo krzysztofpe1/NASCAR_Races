@@ -21,11 +21,8 @@ namespace NASCAR_Races
         public bool IsDisposable { get; set; } = false;
         public bool Started { get; set; } = false;
         
-        public float Length { get; private set; } = 15;
-        public float Width { get; private set; } = 10;
 
         public string CarName { get; private set; }
-        private List<Car> _neighbouringCars;
         
         
 
@@ -49,6 +46,7 @@ namespace NASCAR_Races
                     counter = 0;
                     _neighbouringCars = _worldInfo.NearbyCars(this);
                     if (_neighbouringCars.Count != 0)
+                    //if(true)
                     {
                         //TODO
                         //obliczanie kola po jakim auto musi przejechac, zeby nie uderzyc w inne auto
@@ -66,7 +64,8 @@ namespace NASCAR_Races
                                 //TODO
                                 //jezeli auto bedzie w tej czesci toru, musi obliczyc, czy starczy mu paliwa i opon na jeszcze jedno okrazenie
                                 //tym samym, czy musi zjechac do pitu
-                                if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.TOP))
+                                //if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.TOP))
+                                if (true)
                                 {
                                     _perfectCircle = false;
                                     points = FindCircle(_worldInfo.x1, (int)Y,
@@ -84,7 +83,8 @@ namespace NASCAR_Races
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                                 //Car will enter "right" turn
-                                if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.BOTTOM))
+                                //if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.BOTTOM))
+                                if(true)
                                 {
                                     _perfectCircle = false;
                                     points = FindCircle(_worldInfo.x2, (int)Y,
@@ -99,7 +99,7 @@ namespace NASCAR_Races
                                     _rightCircle = _rightPerfectCircle;
                                     _circleRadius = _perfectCircleRadius;
                                 }
-                            break;
+                                break;
                             case Worldinformation.CIRCUIT_PARTS.PIT:
 
                                 break;

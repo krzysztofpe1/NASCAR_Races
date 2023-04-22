@@ -119,5 +119,13 @@ namespace NASCAR_Races
 
             return points;
         }
+        public bool IsPointOnCircuit(Point point)
+        {
+            if (point.Y > CanvasCenterY)
+            {
+                if (point.Y < CanvasCenterY + TurnRadius + PenCircuitSize / 2) return true;
+            }
+            return false;
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace NASCAR_Races
     {
         public float X { get; set; }
         public float Y { get; set; }
+        public float Length { get; private set; } = 15;
+        public float Width { get; private set; } = 10;
         public float Speed { get; private set; } = 0;
         public float HeadingAngle { get; set; } = 0;
 
@@ -45,6 +47,8 @@ namespace NASCAR_Races
         protected float MaxHorsePower;
         protected float CurrentHorsePower = 55560; // Force should be in the Future
         protected float BrakesForce = 100000;
+
+        protected List<Car> _neighbouringCars;
 
 
 
@@ -167,8 +171,8 @@ namespace NASCAR_Races
                 int enteringPoint = _leftCircle.Y - _circleRadius;
                 if (Y != enteringPoint)
                 {
-                    Y = (Y < enteringPoint) ? Y += 0.3f : Y -= 0.3f;
-                    if(Math.Abs(Y-enteringPoint)<0.3)Y=enteringPoint;
+                    Y = (Y < enteringPoint) ? Y += 1f : Y -= 1f;
+                    if(Math.Abs(Y-enteringPoint)<1)Y=enteringPoint;
                 }
             }
             else
@@ -176,11 +180,15 @@ namespace NASCAR_Races
                 //BOTTOM
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
-                int enteringPoint = _rightCircle.Y + _circleRadius;
+                /*int enteringPoint = _rightCircle.Y + _circleRadius;
                 if (Y != enteringPoint)
                 {
-                    Y = (Y < enteringPoint) ? Y += 0.1f : Y -= 0.1f;
-                    if(Math.Abs(Y-enteringPoint)<0.3)Y=enteringPoint;
+                    Y = (Y < enteringPoint) ? Y += 1f : Y -= 1f;
+                    if(Math.Abs(Y-enteringPoint)<1)Y=enteringPoint;
+                }*/
+                if (DistanceToOpponentOnRight() > 1)
+                {
+                    Y += 1f;
                 }
             }
         }
@@ -328,6 +336,82 @@ namespace NASCAR_Races
             res.Add(centerX);
             res.Add(centerY);
             res.Add(radius);
+            return res;
+        }
+        protected float DistanceToOpponentOnRight()
+        {
+            float distance = _worldInf.PenCircuitSize;
+            foreach(Car car in _neighbouringCars)
+            {
+                List<float> myCoordintes;
+                List<float> opponentCoordinates;
+                myCoordintes = getRightSideCoordinates();
+                opponentCoordinates = car.getLeftSideCoordinates();
+                switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
+                {
+                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.TOP:
+                        //Car will enter "left" turn
+                        
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                        //Car will enter "right" turn
+                        
+                        
+
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.PIT:
+                        
+
+
+
+                        break;
+                }
+            }
+            return 0;
+        }
+        //return:
+        //List[0]=Y coordinate
+        //List[1]=X1 coordinate
+        //List[2]=X2 coordinate
+        public List<float> getRightSideCoordinates()
+        {
+            var partOfTrack = _worldInf.WhatPartOfCircuitIsCarOn(this);
+            List<float>res=new List<float>();
+            if (partOfTrack == Worldinformation.CIRCUIT_PARTS.BOTTOM)
+            {
+                res.Add(Y-Width/2);
+                res.Add(X - Length / 2);
+                res.Add(X + Length / 2);
+            }else if(partOfTrack==Worldinformation.CIRCUIT_PARTS.TOP)
+            {
+                res.Add(Y + Width / 2);
+                res.Add(X - Length / 2);
+                res.Add(X + Length / 2);
+            }
+            return res;
+        }
+        public List<float> getLeftSideCoordinates()
+        {
+            var partOfTrack = _worldInf.WhatPartOfCircuitIsCarOn(this);
+            List<float> res = new List<float>();
+            if (partOfTrack == Worldinformation.CIRCUIT_PARTS.BOTTOM)
+            {
+                res.Add(Y + Width / 2);
+                res.Add(X - Length / 2);
+                res.Add(X + Length / 2);
+            }
+            else if (partOfTrack == Worldinformation.CIRCUIT_PARTS.TOP)
+            {
+                res.Add(Y - Width / 2);
+                res.Add(X - Length / 2);
+                res.Add(X + Length / 2);
+            }
             return res;
         }
     }
