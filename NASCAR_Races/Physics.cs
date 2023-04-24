@@ -14,7 +14,7 @@ namespace NASCAR_Races
         public float HeadingAngle { get; set; } = 0;
 
         const float accelerationOfGravity = 9.81f;
-        const float trackAngle = 10;
+        const float trackAngle = 0.175f;
         const float airDensity = 1.225f;
         const float frontSurface = 2.5f;
         const float carAirDynamic = 0.35f;
@@ -46,7 +46,8 @@ namespace NASCAR_Races
 
         protected float MaxHorsePower;
         protected float CurrentHorsePower = 55560; // Force should be in the Future
-        protected float BrakesForce = 100000;
+        protected float CurrentHorsePowerCopy = 55560; // Force should be in the Future
+        protected float BrakesForce = 50000;
 
         protected List<Car> _neighbouringCars;
 
@@ -55,7 +56,9 @@ namespace NASCAR_Races
         private double currentTurnAngle = -Math.PI / 2;
 
         private Worldinformation _worldInf;
-        
+
+        //LOGS
+        private bool isbraking = false;
 
         public Physics() { }
         public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, Worldinformation worldInfo)
@@ -82,6 +85,27 @@ namespace NASCAR_Races
             _rightPerfectCircle=new Point((int)temp2[0], (int)temp2[1]);
             _rightCircle = _rightPerfectCircle;
         }
+        public void WriteLogs()
+        {
+            Console.Clear();
+            if (isbraking)
+            {
+                Console.WriteLine("IsBraking");
+            }
+            else
+            {
+                Console.WriteLine("NotBraking");
+            }
+            Console.WriteLine("Speed " + Speed);
+            Console.WriteLine("Acceleration: " + _currentAcceleration);
+            if (Speed < 0)
+            {
+                Console.WriteLine("error");
+            }
+
+
+
+        }
         // Run in the loop
         public void RunPhysic()
         {
@@ -93,7 +117,7 @@ namespace NASCAR_Races
             float AirR = AirResistance();
             _currentAcceleration = (AccelerationForce() - AirR - wheelFriction) / _mass;
             Speed += (float)(_currentAcceleration * timeTemp);
-            Console.WriteLine(Speed);
+                
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
 
@@ -138,6 +162,18 @@ namespace NASCAR_Races
             }
 
             _lastExecutionTime = currentTime;
+            WriteLogs();
+        }
+        private void Braking(float timeTemp)
+        {
+            isbraking = true;
+            CurrentHorsePower = 0;
+            Speed -= timeTemp * BrakingForce() / _mass;
+        }
+        private void notBraking()
+        {
+            isbraking = false;
+            CurrentHorsePower = CurrentHorsePowerCopy;
         }
         private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll, Point circle)
         {
@@ -152,7 +188,14 @@ namespace NASCAR_Races
                 a= circle.X;
                 b= circle.Y;
             }
-
+            if(IscentrifugalForce(_circleRadius)!= 0)
+            {
+                Braking(timeElapsed);
+            }
+            else
+            {
+                notBraking();
+            }
             currentTurnAngle += Speed *timeElapsed/ r;
             HeadingAngle =-(float)((currentTurnAngle+Math.PI/2) * (180.0 / Math.PI));
             // Wyznaczamy nowe współrzędne X i Y samochodu
@@ -191,12 +234,17 @@ namespace NASCAR_Races
                     Y += 1f;
                 }
             }
+
+            if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius/2) || (_rightPerfectCircle.Y < Y && X> _rightPerfectCircle.X - _circleRadius /2)))
+            {
+                Braking(timeElapsed);
+            }
+            else
+            {
+                notBraking();
+            }
         }
         
-        public void ConvertSpeedToVectors()
-        {
-
-        }
         public float DistanceFromPointToPoint(float x1,float y1, float x2, float y2)
         {
             return (float)Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
@@ -205,7 +253,9 @@ namespace NASCAR_Races
         //sila odsrodkowa
         public float CentrifugalForce(float radius)
         {
-            return _mass * (float)Math.Pow(Speed, 2) / radius;
+            float CenForce = _mass * (float)Math.Pow(Speed, 2) / radius;
+            //Console.WriteLine("Cen Force: " + CenForce);
+            return CenForce;
         }
         //siła tarcia
         public float FrictionForce()
@@ -221,7 +271,8 @@ namespace NASCAR_Races
         // ile samochód się oddala/przybliża do środka
         private float AccelerationForce()
         {
-            return CurrentHorsePower;
+            float efficency = 1 - (Speed / 100);
+            return CurrentHorsePower * efficency;
         }
         private float BrakingForce()
         {
