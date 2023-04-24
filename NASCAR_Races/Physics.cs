@@ -18,8 +18,8 @@ namespace NASCAR_Races
         const float airDensity = 1.225f;
         const float frontSurface = 2.5f;
         const float carAirDynamic = 0.35f;
-
-        private float _currentAcceleration;
+        //change to private for logs only
+        public float _currentAcceleration;
         private float _mass;
         private float _frictionofweels;
         private System.DateTime _lastExecutionTime;
@@ -58,7 +58,7 @@ namespace NASCAR_Races
         private Worldinformation _worldInf;
 
         //LOGS
-        private bool isbraking = false;
+        public bool isbraking = false;
 
         public Physics() { }
         public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, Worldinformation worldInfo)
@@ -84,27 +84,6 @@ namespace NASCAR_Races
             temp2 = FindCircle(temp);
             _rightPerfectCircle=new Point((int)temp2[0], (int)temp2[1]);
             _rightCircle = _rightPerfectCircle;
-        }
-        public void WriteLogs()
-        {
-            Console.Clear();
-            if (isbraking)
-            {
-                Console.WriteLine("IsBraking");
-            }
-            else
-            {
-                Console.WriteLine("NotBraking");
-            }
-            Console.WriteLine("Speed " + Speed);
-            Console.WriteLine("Acceleration: " + _currentAcceleration);
-            if (Speed < 0)
-            {
-                Console.WriteLine("error");
-            }
-
-
-
         }
         // Run in the loop
         public void RunPhysic()
@@ -162,7 +141,7 @@ namespace NASCAR_Races
             }
 
             _lastExecutionTime = currentTime;
-            WriteLogs();
+            //WriteLogs();
         }
         private void Braking(float timeTemp)
         {

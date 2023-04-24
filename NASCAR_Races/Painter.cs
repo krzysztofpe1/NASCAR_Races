@@ -76,6 +76,28 @@ namespace NASCAR_Races
         {
             if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
             listOfCars.ForEach(car => { PaintCar(g, car); });
+            Console.Clear();
+            listOfCars.ForEach(car => { WriteLogs(car); });
+        }
+        public void WriteLogs(Car car)
+        {
+            //Console.Clear();
+            Console.WriteLine();
+            if (car.isbraking)
+            {
+                Console.WriteLine("IsBraking");
+            }
+            else
+            {
+                Console.WriteLine("NotBraking");
+            }
+            Console.WriteLine("Speed " + car.Speed);
+            Console.WriteLine("Acceleration: " + car._currentAcceleration);
+            if (car.Speed < 0)
+            {
+                Console.WriteLine("error");
+            }
+            Console.WriteLine();
         }
 
         private void PaintCar(Graphics g, Car car)
