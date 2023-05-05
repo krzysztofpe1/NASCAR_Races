@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+
 
 namespace NASCAR_Races
 {
@@ -35,22 +37,24 @@ namespace NASCAR_Races
         Random random = new Random();
         public void Move()
         {
-            _neighbouringCars = _worldInfo.NearbyCars(this);
+            _neighbouringCars = new List<Car>();
             int counter = 0;
             while (!IsDisposable)
             {
                 if (!Started) continue;
                 //refreshing neighbouring cars list every 10 iterations
-                if (++counter >= 10)
-                {
-                    counter = 0;
-                    _neighbouringCars = _worldInfo.NearbyCars(this);
-                    if (_neighbouringCars.Count != 0)
-                    //if(true)
+                var partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this);
+                if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM || partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
+                    if (++counter >= 10)
                     {
+                        counter = 0;
+                        _neighbouringCars = _worldInfo.NearbyCars(this);
+                        //if (_neighbouringCars.Count != 0)
                         //TODO
                         //obliczanie kola po jakim auto musi przejechac, zeby nie uderzyc w inne auto
                         List<Double> points = new List<Double>();
+                        int distanceToOpponentOnLeft = (int)DistanceToOpponentOnLeft();
+                        Debug.WriteLine(distanceToOpponentOnLeft);
                         switch (_worldInfo.WhatPartOfCircuitIsCarOn(this))
                         {
                             case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
@@ -64,17 +68,17 @@ namespace NASCAR_Races
                                 //TODO
                                 //jezeli auto bedzie w tej czesci toru, musi obliczyc, czy starczy mu paliwa i opon na jeszcze jedno okrazenie
                                 //tym samym, czy musi zjechac do pitu
-                                points = FindCircle(_worldInfo.x1, (int)Y,
-                                                    _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)),
-                                                    _worldInfo.x1-_worldInfo.TurnRadius+(int)DistanceToOpponentOnLeft(), _worldInfo.CanvasCenterY);
+                                points = FindCircle(_worldInfo.x1, (int)Y,                                                                          //top
+                                                    _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)),                //bottom
+                                                    _worldInfo.x1 - _worldInfo.TurnRadius - _worldInfo.PenCircuitSize / 2 + distanceToOpponentOnLeft, _worldInfo.CanvasCenterY);    //turn
                                 _leftCircle = new Point((int)points[0], (int)points[1]);
                                 _circleRadius = (int)points[2];
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                                 //Car will enter "right" turn
-                                points = FindCircle(_worldInfo.x2, (int)Y,
-                                                    _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)),
-                                                    _worldInfo.x2+_worldInfo.TurnRadius-(int)DistanceToOpponentOnLeft(), _worldInfo.CanvasCenterY);
+                                points = FindCircle(_worldInfo.x2, (int)Y,                                                                          //bottom
+                                                    _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)),                //top
+                                                    _worldInfo.x2 + _worldInfo.TurnRadius + _worldInfo.PenCircuitSize / 2 - distanceToOpponentOnLeft, _worldInfo.CanvasCenterY);    //turn
                                 _rightCircle = new Point((int)points[0], (int)points[1]);
                                 _circleRadius = (int)points[2];
                                 break;
@@ -83,17 +87,6 @@ namespace NASCAR_Races
                                 break;
                         }
                     }
-                    else
-                    {
-                        Worldinformation.CIRCUIT_PARTS partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this);
-                        if (partOfCircuit != Worldinformation.CIRCUIT_PARTS.LEFT_TURN && partOfCircuit != Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
-                        {
-                            _leftCircle = _leftPerfectCircle;
-                            _rightCircle = _rightPerfectCircle;
-                            _circleRadius = _perfectCircleRadius;
-                        }
-                    }
-                }
                 RunPhysic();
                 Thread.Sleep(10);
             }

@@ -90,7 +90,7 @@ namespace NASCAR_Races
         private Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
-            _nextStartingPos.X -= _straightLength / 30;
+            _nextStartingPos.X -= _straightLength / 25;
             _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
             return tempPoint;
         }

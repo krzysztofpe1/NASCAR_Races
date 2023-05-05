@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,10 +25,6 @@ namespace NASCAR_Races
         public int x1;
         public int x2;
 
-        public Point LeftPerfectCircle;
-        public Point RightPerfectCircle;
-        public int PerfectCircleRadius;
-
         public List<Car> ListOfCars { get; set; }
 
         public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int carViewingRadius, PictureBox mainPictureBox)
@@ -44,11 +41,6 @@ namespace NASCAR_Races
             //x1 and x2 are beggining and ending X coordinates of straights
             x1 = CanvasCenterX - straightLength / 2;
             x2 = CanvasCenterX + straightLength / 2;
-            List<double> points = Physics.FindCircle(PerfectTurnCirclePoints());
-            RightPerfectCircle = new Point((int)points[0], (int)points[1]);
-            points = Physics.FindCircle(PerfectTurnCirclePoints(false));
-            LeftPerfectCircle = new Point((int)points[0], (int)points[1]);
-            PerfectCircleRadius = (int)points[2];
 
             PenCircuitSize = penCircuitSize;
             CarViewingRadius = carViewingRadius;
@@ -75,19 +67,14 @@ namespace NASCAR_Races
             BOTTOM,
             PIT
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car, bool perfectCircle = true)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car)
         {
-            return WhatPartOfCircuitIsCarOn(car.X, car.Y, perfectCircle);
+            return WhatPartOfCircuitIsCarOn(car.X, car.Y);
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(float x, float y, bool perfectCircle)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(float x, float y)
         {
-            if (!perfectCircle)
-            {
-                if (x < x1) return CIRCUIT_PARTS.LEFT_TURN;
-                if (x > x2) return CIRCUIT_PARTS.RIGHT_TURN;
-            }
-            if (x < LeftPerfectCircle.X) return CIRCUIT_PARTS.LEFT_TURN;
-            if (x > RightPerfectCircle.X) return CIRCUIT_PARTS.RIGHT_TURN;
+            if (x <= x1) return CIRCUIT_PARTS.LEFT_TURN;
+            if (x >= x2) return CIRCUIT_PARTS.RIGHT_TURN;
             if (y < CanvasCenterY) return CIRCUIT_PARTS.TOP;
             if (y > CanvasCenterY) return CIRCUIT_PARTS.BOTTOM;
             return CIRCUIT_PARTS.PIT;
