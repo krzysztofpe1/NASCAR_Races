@@ -15,16 +15,16 @@ namespace NASCAR_Races
             ON_WAY_TO_PIT_STOP,
             PIT_STOP
         }
-        
+
         public STATE State { get; private set; } = Car.STATE.ON_CIRCUIT;
 
         public bool IsDisposable { get; set; } = false;
         public bool Started { get; set; } = false;
-        
+
 
         public string CarName { get; private set; }
-        
-        
+
+
 
         private Worldinformation _worldInfo;
         public Car(float x, float y, float weight, float fuelCapacity, string carName, Worldinformation worldInfo) : base(x, y, weight, fuelCapacity, 0.3f, worldInfo)
@@ -51,7 +51,7 @@ namespace NASCAR_Races
                         //TODO
                         //obliczanie kola po jakim auto musi przejechac, zeby nie uderzyc w inne auto
                         List<Double> points = new List<Double>();
-                        switch (_worldInfo.WhatPartOfCircuitIsCarOn(this, _perfectCircle))
+                        switch (_worldInfo.WhatPartOfCircuitIsCarOn(this))
                         {
                             case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
 
@@ -64,41 +64,19 @@ namespace NASCAR_Races
                                 //TODO
                                 //jezeli auto bedzie w tej czesci toru, musi obliczyc, czy starczy mu paliwa i opon na jeszcze jedno okrazenie
                                 //tym samym, czy musi zjechac do pitu
-                                //if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.TOP))
-                                if (true)
-                                {
-                                    _perfectCircle = false;
-                                    points = FindCircle(_worldInfo.x1, (int)Y,
-                                                        _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)));
-                                    _leftCircle = new Point((int)points[0], (int)points[1]);
-                                    _circleRadius = (int)points[2];
-                                }
-                                else
-                                {
-                                    _perfectCircle = true;
-                                    _leftCircle = _leftPerfectCircle;
-                                    _rightCircle = _rightPerfectCircle;
-                                    _circleRadius = _perfectCircleRadius;
-                                }
+                                points = FindCircle(_worldInfo.x1, (int)Y,
+                                                    _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)),
+                                                    _worldInfo.x1-_worldInfo.TurnRadius+(int)DistanceToOpponentOnLeft(), _worldInfo.CanvasCenterY);
+                                _leftCircle = new Point((int)points[0], (int)points[1]);
+                                _circleRadius = (int)points[2];
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                                 //Car will enter "right" turn
-                                //if (AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS.BOTTOM))
-                                if(true)
-                                {
-                                    _perfectCircle = false;
-                                    points = FindCircle(_worldInfo.x2, (int)Y,
-                                                        _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)));
-                                    _rightCircle= new Point((int)points[0], (int)points[1]);
-                                    _circleRadius= (int)points[2];
-                                }
-                                else
-                                {
-                                    _perfectCircle = true;
-                                    _leftCircle = _leftPerfectCircle;
-                                    _rightCircle = _rightPerfectCircle;
-                                    _circleRadius = _perfectCircleRadius;
-                                }
+                                points = FindCircle(_worldInfo.x2, (int)Y,
+                                                    _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)),
+                                                    _worldInfo.x2+_worldInfo.TurnRadius-(int)DistanceToOpponentOnLeft(), _worldInfo.CanvasCenterY);
+                                _rightCircle = new Point((int)points[0], (int)points[1]);
+                                _circleRadius = (int)points[2];
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.PIT:
 
@@ -107,10 +85,9 @@ namespace NASCAR_Races
                     }
                     else
                     {
-                        Worldinformation.CIRCUIT_PARTS partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this, _perfectCircle);
+                        Worldinformation.CIRCUIT_PARTS partOfCircuit = _worldInfo.WhatPartOfCircuitIsCarOn(this);
                         if (partOfCircuit != Worldinformation.CIRCUIT_PARTS.LEFT_TURN && partOfCircuit != Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
                         {
-                            _perfectCircle = true;
                             _leftCircle = _leftPerfectCircle;
                             _rightCircle = _rightPerfectCircle;
                             _circleRadius = _perfectCircleRadius;

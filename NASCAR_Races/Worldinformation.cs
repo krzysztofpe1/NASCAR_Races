@@ -40,13 +40,13 @@ namespace NASCAR_Races
             TurnRadius = turnRadius;
             TurnCurveRadius = turnCurveRadius;
             PitPosY = pitPosY;
-            OuterBounds = new Point(CanvasCenterX - StraightLength/2-TurnRadius/2);
+            OuterBounds = new Point(CanvasCenterX - StraightLength / 2 - TurnRadius / 2);
             //x1 and x2 are beggining and ending X coordinates of straights
             x1 = CanvasCenterX - straightLength / 2;
             x2 = CanvasCenterX + straightLength / 2;
             List<double> points = Physics.FindCircle(PerfectTurnCirclePoints());
             RightPerfectCircle = new Point((int)points[0], (int)points[1]);
-            points= Physics.FindCircle(PerfectTurnCirclePoints(false));
+            points = Physics.FindCircle(PerfectTurnCirclePoints(false));
             LeftPerfectCircle = new Point((int)points[0], (int)points[1]);
             PerfectCircleRadius = (int)points[2];
 
@@ -60,7 +60,7 @@ namespace NASCAR_Races
             List<Car> res = new List<Car>();
             ListOfCars.ForEach(car =>
             {
-                if (callerCar!=car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2))
+                if (callerCar != car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2))
                 {
                     res.Add(car);
                 }
@@ -104,7 +104,7 @@ namespace NASCAR_Races
         public List<Point> PerfectTurnCirclePoints(bool rightCircle = true)
         {
             List<Point> points = new List<Point>();
-            if(rightCircle)
+            if (rightCircle)
             {
                 points.Add(new Point(x2, CanvasCenterY + TurnRadius + PenCircuitSize / 2 - PenCircuitSize / 4));//dol
                 points.Add(new Point(x2, CanvasCenterY - TurnRadius - PenCircuitSize / 2 + PenCircuitSize / 4));//gora
@@ -119,13 +119,24 @@ namespace NASCAR_Races
 
             return points;
         }
-        public bool IsPointOnCircuit(Point point)
+        public float DistanceToEdgeOfTrack(Physics car, bool outerEdge = true)
         {
-            if (point.Y > CanvasCenterY)
+            var part = WhatPartOfCircuitIsCarOn(car);
+            if (part == CIRCUIT_PARTS.TOP)
             {
-                if (point.Y < CanvasCenterY + TurnRadius + PenCircuitSize / 2) return true;
+                float trackY = CanvasCenterY - TurnRadius;
+                if (outerEdge) trackY -= PenCircuitSize / 2;
+                else trackY += PenCircuitSize / 2;
+                return Math.Abs(car.Y - trackY);
             }
-            return false;
+            if (part == CIRCUIT_PARTS.BOTTOM)
+            {
+                float trackY = CanvasCenterY + TurnRadius;
+                if (outerEdge) trackY += PenCircuitSize / 2;
+                else trackY -= PenCircuitSize / 2;
+                return Math.Abs(trackY - car.Y);
+            }
+            return 0;
         }
     }
 }
