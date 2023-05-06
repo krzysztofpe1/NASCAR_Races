@@ -29,7 +29,7 @@ namespace NASCAR_Races
 
 
         private Worldinformation _worldInfo;
-        public Car(float x, float y, float weight, float fuelCapacity, string carName, Worldinformation worldInfo) : base(x, y, weight, fuelCapacity, 0.3f, worldInfo)
+        public Car(float x, float y, float weight, float fuelCapacity, string carName, float maxHorsePower, Worldinformation worldInfo) : base(x, y, weight, fuelCapacity, 0.3f, maxHorsePower, worldInfo)
         {
             CarName = carName;
             _worldInfo = worldInfo;

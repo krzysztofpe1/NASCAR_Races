@@ -54,11 +54,12 @@ namespace NASCAR_Races
 
         public List<Car> CreateListOfCars(int numberOfCars)
         {
+            Random random = new Random();
             ListOfCarThreads = new List<CarThread>();
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), Worldinformation);
+                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), 20000+(float)random.NextDouble()*10000, Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
@@ -90,7 +91,7 @@ namespace NASCAR_Races
         private Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
-            _nextStartingPos.X -= _straightLength / 25;
+            _nextStartingPos.X -= _straightLength / 45;
             _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
             return tempPoint;
         }

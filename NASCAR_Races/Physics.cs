@@ -36,16 +36,12 @@ namespace NASCAR_Races
         private float _turnRadius;
         private float _UseOftires = 0.5f;
 
-
-        protected float GasPedalDepression;
-
         protected float FuelMass;
         protected float FuelCapacity;
         protected float FuelBurningRatio = 0.5f;
 
         protected float MaxHorsePower;
-        protected float CurrentHorsePower = 5556000; // Force should be in the Future
-        protected float CurrentHorsePowerCopy = 5556000; // Force should be in the Future
+        protected float CurrentHorsePower;
         protected float BrakesForce = 50000;
 
         protected List<Car> _neighbouringCars;
@@ -60,7 +56,7 @@ namespace NASCAR_Races
         public bool isbraking = false;
 
         public Physics() { }
-        public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, Worldinformation worldInfo)
+        public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, float maxHorsePower, Worldinformation worldInfo)
         {
             X = x;
             Y = y;
@@ -69,6 +65,8 @@ namespace NASCAR_Races
             FuelMass = fuelCapacity;
             FuelCapacity = fuelCapacity;
             _frictionofweels = frictionofweels;
+            MaxHorsePower = maxHorsePower;
+            CurrentHorsePower = MaxHorsePower;
             _lastExecutionTime = DateTime.Now;
 
             _worldInf = worldInfo;
@@ -114,7 +112,6 @@ namespace NASCAR_Races
             }
 
             _lastExecutionTime = currentTime;
-            //WriteLogs();
         }
         private void Braking(float timeTemp)
         {
@@ -125,13 +122,13 @@ namespace NASCAR_Races
         private void notBraking()
         {
             isbraking = false;
-            CurrentHorsePower = CurrentHorsePowerCopy;
+            CurrentHorsePower = MaxHorsePower;
         }
         private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll, Point circle)
         {
             if (!TEMPORARY_TURNING_BOOL)
             {
-                currentTurnAngle = calculateEnteringAngle(rightCircleControll);
+                currentTurnAngle = CalculateEnteringAngle(rightCircleControll);
                 TEMPORARY_TURNING_BOOL = true;
             }
             Debug.WriteLine(X + " " + _rightCircle.X);
@@ -142,7 +139,7 @@ namespace NASCAR_Races
             // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
             float a = circle.X;
             float b = circle.Y;
-            /*if(IscentrifugalForce(_circleRadius)!= 0)
+            /*if (IscentrifugalForce(_circleRadius) != 0)
             {
                 Braking(timeElapsed);
             }
@@ -179,7 +176,7 @@ namespace NASCAR_Races
                 }
             }
 
-            /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius/2) || (_rightPerfectCircle.Y < Y && X> _rightPerfectCircle.X - _circleRadius /2)))
+            /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
             {
                 Braking(timeElapsed);
             }
@@ -339,7 +336,7 @@ namespace NASCAR_Races
             float distance = _worldInf.DistanceToEdgeOfTrack(this);
             foreach (Car car in _neighbouringCars)
             {
-                if (Math.Abs(X - car.X) > Length / 2 + car.Length / 3) continue;
+                if (Math.Abs(X - car.X) > Length / 2 + car.Length / 2) continue;
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
@@ -380,7 +377,6 @@ namespace NASCAR_Races
         protected float DistanceToOpponentOnLeft()
         {
             float distance = _worldInf.DistanceToEdgeOfTrack(this, false);
-            //Debug.WriteLine(distance);
             foreach (Car car in _neighbouringCars)
             {
                 if (Math.Abs(X - car.X) > Length / 2 + car.Length / 2) continue;
@@ -419,7 +415,7 @@ namespace NASCAR_Races
             return distance;
         }
 
-        private float calculateEnteringAngle(bool rightTurnControl)
+        private float CalculateEnteringAngle(bool rightTurnControl)
         {
             if (rightTurnControl)
             {
