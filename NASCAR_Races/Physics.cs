@@ -339,7 +339,7 @@ namespace NASCAR_Races
             float distance = _worldInf.DistanceToEdgeOfTrack(this);
             foreach (Car car in _neighbouringCars)
             {
-                bool fitment = (Math.Abs(X - car.X) - Length > 0) ? true : false;
+                if (Math.Abs(X - car.X) > Length / 2 + car.Length / 3) continue;
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
@@ -351,19 +351,19 @@ namespace NASCAR_Races
                         break;
                     case Worldinformation.CIRCUIT_PARTS.TOP:
                         //Car will enter "left" turn
-                        if (car.Y < Y && !fitment)
+                        if (car.Y < Y)
                         {
                             //opponent is on the right side of this car
-                            temp = Y - Width / 2 - car.Y + car.Width / 2;
+                            temp = (Y - Width / 2) - (car.Y + car.Width / 2);
                             if (temp < distance) distance = temp;
                         }
                         break;
                     case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                         //Car will enter "right" turn
-                        if (car.Y > Y && !fitment)
+                        if (car.Y > Y)
                         {
                             //opponent is on the right side of this car
-                            temp = car.Y - car.Width / 2 - Y + Width / 2;
+                            temp = (car.Y - car.Width / 2) - (Y + Width / 2);
                             if (temp < distance) distance = temp;
                         }
                         break;
@@ -418,76 +418,39 @@ namespace NASCAR_Races
             }
             return distance;
         }
-        //return:
-        //List[0]=Y coordinate
-        //List[1]=X1 coordinate
-        //List[2]=X2 coordinate
-        /*public List<float> getRightSideCoordinates()
-        {
-            var partOfTrack = _worldInf.WhatPartOfCircuitIsCarOn(this);
-            List<float>res=new List<float>();
-            if (partOfTrack == Worldinformation.CIRCUIT_PARTS.BOTTOM)
-            {
-                res.Add(Y-Width/2);
-                res.Add(X - Length / 2);
-                res.Add(X + Length / 2);
-            }else if(partOfTrack==Worldinformation.CIRCUIT_PARTS.TOP)
-            {
-                res.Add(Y + Width / 2);
-                res.Add(X - Length / 2);
-                res.Add(X + Length / 2);
-            }
-            return res;
-        }
-        public List<float> getLeftSideCoordinates()
-        {
-            var partOfTrack = _worldInf.WhatPartOfCircuitIsCarOn(this);
-            List<float> res = new List<float>();
-            if (partOfTrack == Worldinformation.CIRCUIT_PARTS.BOTTOM)
-            {
-                res.Add(Y + Width / 2);
-                res.Add(X - Length / 2);
-                res.Add(X + Length / 2);
-            }
-            else if (partOfTrack == Worldinformation.CIRCUIT_PARTS.TOP)
-            {
-                res.Add(Y - Width / 2);
-                res.Add(X - Length / 2);
-                res.Add(X + Length / 2);
-            }
-            return res;
-        }*/
 
         private float calculateEnteringAngle(bool rightTurnControl)
         {
-            // Współrzędne srodka okręgu
-            float center_x = 0;
-            float center_y = 0;
             if (rightTurnControl)
             {
-                center_x = _rightCircle.X;
-                center_y = _rightCircle.Y;
+                if (Y < _worldInf.CanvasCenterY)
+                {
+                    //TOP RIGHT
+                    double alpha = Math.Asin(Math.Abs(Y - _rightCircle.Y) / _circleRadius);
+                    return (float)alpha;
+                }
+                else
+                {
+                    //BOTTOM RIGHT
+                    double alpha = Math.Asin(Math.Abs(X - _rightCircle.X) / _circleRadius);
+                    return (float)(alpha - Math.PI / 2);
+                }
             }
             else
             {
-                center_x = _leftCircle.X;
-                center_y = _leftCircle.Y;
+                if (Y < _worldInf.CanvasCenterY)
+                {
+                    //TOP LEFT
+                    double alpha = Math.Asin(Math.Abs(X - _leftCircle.X) / _circleRadius);
+                    return (float)(alpha + Math.PI / 2);
+                }
+                else
+                {
+                    //BOTTOM LEFT
+                    double alpha = Math.Asin(Math.Abs(Y - _leftCircle.Y) / _circleRadius);
+                    return (float)(alpha + Math.PI);
+                }
             }
-            // Współrzędna Y prostej
-            float line_y = center_y;
-
-            // Obliczenie wektorów łączących punkt z srodkiem okręgu i punktu z srodkiem okręgu na tej samej wysokości co prosta
-            float dx = X - center_x;
-            float dy = Y - center_y;
-            float dy2 = line_y - center_y;
-
-            // Obliczenie kąta między tymi wektorami w radianach
-            float theta_radians = (float)(Math.Atan2(dy, dx) - Math.Atan2(dy2, dx));
-            if (rightTurnControl) theta_radians *= -1;
-            else theta_radians += (float)(Math.PI / 4);
-            // Wyświetlenie wyniku w konsoli
-            //Debug.WriteLine("Kąt między punktem ({0}, {1}), srodkiem okręgu ({2}, {3}) i prostą o Y = {4} wynosi {5} radianów", x, y, center_x, center_y, line_y, theta_radians);
-            return theta_radians;
         }
     }
 }
