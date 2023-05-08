@@ -29,8 +29,8 @@ namespace NASCAR_Races
         private bool _killCollisionChecker = false;
 
         public Worldinformation Worldinformation { get; }
-        
-        public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, PictureBox mainPictureBox)
+
+        public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, PictureBox mainPictureBox)
         {
             _canvasWidth = mainPictureBox.Width;
             _canvasHeight = mainPictureBox.Height;
@@ -40,7 +40,7 @@ namespace NASCAR_Races
             _turnRadius = turnRadius;
             _pitPosY = pitPosY;
             _turnCurveRadius = turnCurveRadius;
-            
+
             _nextStartingPos = new Point();
             _firstRow = _canvasHeight / 2 + _turnRadius + penCircuitSize / 4;
             _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 4;
@@ -49,7 +49,7 @@ namespace NASCAR_Races
 
             _thread = new(CheckCollisions);
 
-            Worldinformation= new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, 50, mainPictureBox);
+            Worldinformation = new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 50, mainPictureBox);
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -59,11 +59,11 @@ namespace NASCAR_Races
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), 20000+(float)random.NextDouble()*10000, Worldinformation);
+                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000, Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
-            Worldinformation.ListOfCars= ListOfCars;
+            Worldinformation.ListOfCars = ListOfCars;
             return ListOfCars;
         }
 

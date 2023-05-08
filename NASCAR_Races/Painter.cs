@@ -32,7 +32,7 @@ namespace NASCAR_Races
             _pitPosY = worldinformation.PitPosY;
             _penCircuit = new Pen(Color.Black, worldinformation.PenCircuitSize);
             _penPit = new Pen(Color.Orange, worldinformation.PenCircuitSize/2);
-            _penCar = new Pen(Color.Red, 5);
+            _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;
             _x2 = _canvasWidth / 2 + _straightLength / 2;
         }

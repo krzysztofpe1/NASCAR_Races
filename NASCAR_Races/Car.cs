@@ -49,7 +49,6 @@ namespace NASCAR_Races
             while (!IsDisposable)
             {
                 if (!Started) continue;
-                Debug.WriteLine(X + " " + Y);
                 //refreshing neighbouring cars list every 10 iterations
                 var partOfCircuit = WhatPartOfCircuitIsCarOn();
                 if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM || partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
@@ -115,34 +114,5 @@ namespace NASCAR_Races
             if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.BOTTOM) return new Point((int)(X - Length / 2), (int)(Y + Width / 2));
             return new Point();
         }
-        //return true if there is at least one opponent on the left side
-        private bool AreThereOpponentsOnSide(Worldinformation.CIRCUIT_PARTS partOfCircuit)
-        {
-            foreach (Car car in _neighbouringCars)
-            {
-                switch (partOfCircuit)
-                {
-                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
-                        //if (car.X < X) return true;
-                        break;
-                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
-                        //if(car.X > X) return true;
-                        break;
-                    case Worldinformation.CIRCUIT_PARTS.TOP:
-                        //Car will enter "left" turn
-                        if (car.Y > Y) return true;
-                        break;
-                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
-                        //Car will enter "right" turn
-                        if (car.Y < Y) return true;
-                        break;
-                    case Worldinformation.CIRCUIT_PARTS.PIT:
-                        return false;
-                }
-            }
-            return false;
-        }
-
-
     }
 }

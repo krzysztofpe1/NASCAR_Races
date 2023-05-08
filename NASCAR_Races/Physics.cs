@@ -82,10 +82,6 @@ namespace NASCAR_Races
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
             var partOfCircuit = WhatPartOfCircuitIsCarOn();
-            if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM) Debug.WriteLine("BOTTOM");
-            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP) Debug.WriteLine("TOP");
-            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.RIGHT_TURN) Debug.WriteLine("RIGHT");
-            else Debug.WriteLine("LEFT");
             if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
             {
                 MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightCircle);
@@ -143,25 +139,43 @@ namespace NASCAR_Races
         }
         private void MoveCarOnStraight(float timeElapsed, Worldinformation.CIRCUIT_PARTS partOfCircuit)
         {
-            if (partOfCircuit==Worldinformation.CIRCUIT_PARTS.TOP)
+            if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
             {
                 //TOP
-                X -= Speed * timeElapsed;
-                HeadingAngle = 0;
-                if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
+                // if car in front is slower then go to the left
+                (float, float) temp = DistanceToAndSpeedOfOpponentInFront();
+                if (temp.Item1 < float.MaxValue && temp.Item2 < Speed)
+                {
+                    if (DistanceToOpponentOnLeft() > 1)
+                    {
+                        Y += 0.5f;
+                    }
+                }
+                else if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
                 {
                     Y -= 0.5f;
                 }
+                X -= Speed * timeElapsed;
+                HeadingAngle = 0;
+                
             }
-            else if(partOfCircuit==Worldinformation.CIRCUIT_PARTS.BOTTOM)
+            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM)
             {
                 //BOTTOM
-                X += Speed * timeElapsed;
-                HeadingAngle = 180;
-                if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
+                (float, float) temp = DistanceToAndSpeedOfOpponentInFront();
+                if (temp.Item1 < float.MaxValue && temp.Item2 < Speed)
+                {
+                    if (DistanceToOpponentOnLeft() > 1)
+                    {
+                        Y -= 0.5f;
+                    }
+                }
+                else if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
                 {
                     Y += 0.5f;
                 }
+                X += Speed * timeElapsed;
+                HeadingAngle = 180;
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
@@ -233,101 +247,28 @@ namespace NASCAR_Races
                     return frictionAll - XFroce;
             }
         }
-        public static List<double> FindCircle(List<Point> points)
-        {
-            if (points.Count == 3)
-                return FindCircle(points[0].X, points[0].Y, points[1].X, points[1].Y, points[2].X, points[2].Y);
-            return FindCircle(points[0].X, points[0].Y, points[1].X, points[1].Y);
-        }
-        //returns List where:
-        //List[0] - X coordinate of Circle Center
-        //List[1] - Y coordinate of Circle Center
-        //List[2] - Radius of Circle
-        protected static List<double> FindCircle(int x1, int y1,
-                                        int x2, int y2,
-                                        int x3, int y3)
-        {
-            double x12 = x1 - x2;
-            double x13 = x1 - x3;
-
-            double y12 = y1 - y2;
-            double y13 = y1 - y3;
-
-            double y31 = y3 - y1;
-            double y21 = y2 - y1;
-
-            double x31 = x3 - x1;
-            double x21 = x2 - x1;
-
-            // x1^2 - x3^2
-            double sx13 = (int)(Math.Pow(x1, 2) -
-                            Math.Pow(x3, 2));
-
-            // y1^2 - y3^2
-            double sy13 = (int)(Math.Pow(y1, 2) -
-                            Math.Pow(y3, 2));
-
-            double sx21 = (int)(Math.Pow(x2, 2) -
-                            Math.Pow(x1, 2));
-
-            double sy21 = (int)(Math.Pow(y2, 2) -
-                            Math.Pow(y1, 2));
-
-            double f = ((sx13) * (x12)
-                    + (sy13) * (x12)
-                    + (sx21) * (x13)
-                    + (sy21) * (x13))
-                    / (2 * ((y31) * (x12) - (y21) * (x13)));
-            double g = ((sx13) * (y12)
-                    + (sy13) * (y12)
-                    + (sx21) * (y13)
-                    + (sy21) * (y13))
-                    / (2 * ((x31) * (y12) - (x21) * (y13)));
-
-            double c = -Math.Pow(x1, 2) - Math.Pow(y1, 2) -
-                                        2 * g * x1 - 2 * f * y1;
-
-            // eqn of circle be x^2 + y^2 + 2*g*x + 2*f*y + c = 0
-            // where centre is (h = -g, k = -f) and radius r
-            // as r^2 = h^2 + k^2 - c
-            double h = -g;
-            double k = -f;
-            double sqr_of_r = h * h + k * k - c;
-
-            // r is the radius
-            double r = Math.Round(Math.Sqrt(sqr_of_r), 5);
-
-            List<double> result = new List<double>();
-            result.Add(h);
-            result.Add(k);
-            result.Add(r);
-            return result;
-        }
-        //works only when x1=x2
-        protected static List<double> FindCircle(int x1, int y1,
-                                        int x2, int y2)
-        {
-            double centerX = x1;
-            double centerY = (y1 + y2) / 2.0;
-            double radius = Math.Abs(y1 - y2) / 2.0;
-            List<double> res = new List<double>();
-            res.Add(centerX);
-            res.Add(centerY);
-            res.Add(radius);
-            return res;
-        }
         protected void FindCircle(int y, bool righCircleControl)
         {
             _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
             int x;
             if (righCircleControl)
             {
-                x = _worldInf.x2 + _worldInf.TurnRadius - _circleRadius + _worldInf.PenCircuitSize / 2 - (int)DistanceToOpponentOnLeft();
+                float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
+                if (DistanceToOpponentOnLeft() < distanceToEdgeOfTrackInTheMiddleOfTurn)
+                {
+                    distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
+                }
+                x = _worldInf.x2 + _worldInf.TurnRadius - _circleRadius + _worldInf.PenCircuitSize / 2 - (int)distanceToEdgeOfTrackInTheMiddleOfTurn;
                 _rightCircle = new Point(x, _worldInf.CanvasCenterY);
             }
             else
             {
-                x = _worldInf.x1 - _worldInf.TurnRadius + _circleRadius - _worldInf.PenCircuitSize / 2 + (int)DistanceToOpponentOnLeft();
+                float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
+                if (DistanceToOpponentOnLeft() < distanceToEdgeOfTrackInTheMiddleOfTurn)
+                {
+                    distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
+                }
+                x = _worldInf.x1 - _worldInf.TurnRadius + _circleRadius - _worldInf.PenCircuitSize / 2 + (int)distanceToEdgeOfTrackInTheMiddleOfTurn;
                 _leftCircle = new Point(x, _worldInf.CanvasCenterY);
             }
         }
@@ -417,6 +358,41 @@ namespace NASCAR_Races
             }
             return distance;
         }
+        protected (float, float) DistanceToAndSpeedOfOpponentInFront()
+        {
+            float distance = float.MaxValue;
+            Car tempCar = null;
+            foreach (Car car in _neighbouringCars)
+            {
+                int temp;
+                switch (WhatPartOfCircuitIsCarOn())
+                {
+                    case Worldinformation.CIRCUIT_PARTS.TOP:
+                        if (car.X > X) continue;
+                        if (Math.Abs(car.Y - Y) > Width / 2 + car.Width / 2) continue;
+                        temp = (int)((X - Length / 2) - (car.X + car.Length / 2));
+                        if (temp < distance)
+                        {
+                            distance = temp;
+                            tempCar = car;
+                        }
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                        if (car.X < X) continue;
+                        if (Math.Abs(car.Y - Y) > Width / 2 + car.Width / 2) continue;
+                        temp = (int)((car.X - car.Length / 2) - (X + Length / 2));
+                        if (temp < distance)
+                        {
+                            distance = temp;
+                            tempCar = car;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return (distance, (tempCar != null) ? tempCar.Speed : 0);
+        }
         private float CalculateEnteringAngle(bool rightTurnControl)
         {
             if (rightTurnControl)
@@ -457,5 +433,6 @@ namespace NASCAR_Races
             if (Y < _worldInf.CanvasCenterY) return Worldinformation.CIRCUIT_PARTS.TOP;
             return Worldinformation.CIRCUIT_PARTS.BOTTOM;
         }
+
     }
 }

@@ -20,6 +20,7 @@ namespace NASCAR_Races
         public Point OuterBounds { get; }
         public Point InnerBounds { get; }
         public int PenCircuitSize { get; }
+        public int PenCarSize { get; }
         public int CarViewingRadius { get; }
 
         public int x1;
@@ -27,7 +28,7 @@ namespace NASCAR_Races
 
         public List<Car> ListOfCars { get; set; }
 
-        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int carViewingRadius, PictureBox mainPictureBox)
+        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
@@ -43,6 +44,7 @@ namespace NASCAR_Races
             x2 = CanvasCenterX + straightLength / 2;
 
             PenCircuitSize = penCircuitSize;
+            PenCarSize = penCarSize;
             CarViewingRadius = carViewingRadius;
         }
 
