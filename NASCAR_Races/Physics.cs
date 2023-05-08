@@ -7,8 +7,8 @@ namespace NASCAR_Races
 {
     public class Physics
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public float X { get; private set; } = 0;
+        public float Y { get; private set; } = 0;
         public float Length { get; private set; } = 15;
         public float Width { get; private set; } = 10;
         public float Speed { get; private set; } = 0;
@@ -29,10 +29,6 @@ namespace NASCAR_Races
         protected Point _rightCircle { get; set; }
         protected int _circleRadius { get; set; }
 
-        protected Point _leftPerfectCircle { get; }
-        protected Point _rightPerfectCircle { get; }
-        protected int _perfectCircleRadius { get; }
-
         private float _turnRadius;
         private float _UseOftires = 0.5f;
 
@@ -40,13 +36,13 @@ namespace NASCAR_Races
         protected float FuelCapacity;
         protected float FuelBurningRatio = 0.5f;
 
-        protected float MaxHorsePower;
+        protected float MaxHorsePower { get; private set; }
         protected float CurrentHorsePower;
         protected float BrakesForce = 50000;
 
         protected List<Car> _neighbouringCars;
 
-        bool TEMPORARY_TURNING_BOOL = false;
+        protected bool _recalculateHeadingAngle = false;
 
         private double currentTurnAngle = -Math.PI / 2;
 
@@ -70,17 +66,6 @@ namespace NASCAR_Races
             _lastExecutionTime = DateTime.Now;
 
             _worldInf = worldInfo;
-
-            List<Point> temp = worldInfo.PerfectTurnCirclePoints(false);
-            List<double> temp2 = FindCircle(temp);
-            _leftPerfectCircle = new Point((int)temp2[0], (int)temp2[1]);
-            _leftCircle = _leftPerfectCircle;
-            _perfectCircleRadius = (int)temp2[2];
-            _circleRadius = _perfectCircleRadius;
-            temp = worldInfo.PerfectTurnCirclePoints();
-            temp2 = FindCircle(temp);
-            _rightPerfectCircle = new Point((int)temp2[0], (int)temp2[1]);
-            _rightCircle = _rightPerfectCircle;
         }
         // Run in the loop
         public void RunPhysic()
@@ -90,13 +75,17 @@ namespace NASCAR_Races
             //float FF = FrictionForce(); // siła która przeciwdziała sile dośrodkowej
             float timeTemp = (float)timeSinceLastExecution.TotalSeconds;
             float wheelFriction = 60;
-            float AirR = AirResistance();
-            _currentAcceleration = (AccelerationForce() - AirR - wheelFriction) / _mass;
+            float airR = AirResistance();
+            _currentAcceleration = (AccelerationForce() - airR - wheelFriction) / _mass;
             Speed += (float)(_currentAcceleration * timeTemp);
 
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
-            var partOfCircuit = _worldInf.WhatPartOfCircuitIsCarOn(this);
+            var partOfCircuit = WhatPartOfCircuitIsCarOn();
+            if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM) Debug.WriteLine("BOTTOM");
+            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP) Debug.WriteLine("TOP");
+            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.RIGHT_TURN) Debug.WriteLine("RIGHT");
+            else Debug.WriteLine("LEFT");
             if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
             {
                 MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightCircle);
@@ -107,8 +96,8 @@ namespace NASCAR_Races
             }
             else
             {
-                MoveCarOnStraight((float)timeSinceLastExecution.TotalSeconds);
-                TEMPORARY_TURNING_BOOL = false;
+                MoveCarOnStraight((float)timeSinceLastExecution.TotalSeconds, partOfCircuit);
+                _recalculateHeadingAngle = false;
             }
 
             _lastExecutionTime = currentTime;
@@ -126,12 +115,11 @@ namespace NASCAR_Races
         }
         private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll, Point circle)
         {
-            if (!TEMPORARY_TURNING_BOOL)
+            if (!_recalculateHeadingAngle)
             {
                 currentTurnAngle = CalculateEnteringAngle(rightCircleControll);
-                TEMPORARY_TURNING_BOOL = true;
+                _recalculateHeadingAngle = true;
             }
-            Debug.WriteLine(X + " " + _rightCircle.X);
             //distanceToEndOfTheTrack = positionofcar - positionofBorder
             //float r = DistanceFromPointToPoint(X, Y, circle.X, circle.Y);
             float r = _circleRadius;
@@ -153,9 +141,9 @@ namespace NASCAR_Races
             X = a + r * (float)Math.Cos(-currentTurnAngle);
             Y = b + r * (float)Math.Sin(-currentTurnAngle);
         }
-        private void MoveCarOnStraight(float timeElapsed)
+        private void MoveCarOnStraight(float timeElapsed, Worldinformation.CIRCUIT_PARTS partOfCircuit)
         {
-            if (Y < _worldInf.CanvasCenterY)
+            if (partOfCircuit==Worldinformation.CIRCUIT_PARTS.TOP)
             {
                 //TOP
                 X -= Speed * timeElapsed;
@@ -165,7 +153,7 @@ namespace NASCAR_Races
                     Y -= 0.5f;
                 }
             }
-            else
+            else if(partOfCircuit==Worldinformation.CIRCUIT_PARTS.BOTTOM)
             {
                 //BOTTOM
                 X += Speed * timeElapsed;
@@ -328,6 +316,21 @@ namespace NASCAR_Races
             res.Add(radius);
             return res;
         }
+        protected void FindCircle(int y, bool righCircleControl)
+        {
+            _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
+            int x;
+            if (righCircleControl)
+            {
+                x = _worldInf.x2 + _worldInf.TurnRadius - _circleRadius + _worldInf.PenCircuitSize / 2 - (int)DistanceToOpponentOnLeft();
+                _rightCircle = new Point(x, _worldInf.CanvasCenterY);
+            }
+            else
+            {
+                x = _worldInf.x1 - _worldInf.TurnRadius + _circleRadius - _worldInf.PenCircuitSize / 2 + (int)DistanceToOpponentOnLeft();
+                _leftCircle = new Point(x, _worldInf.CanvasCenterY);
+            }
+        }
         //return:
         //distance to opponent on right if there is any
         //distance to the edge of circuit
@@ -414,7 +417,6 @@ namespace NASCAR_Races
             }
             return distance;
         }
-
         private float CalculateEnteringAngle(bool rightTurnControl)
         {
             if (rightTurnControl)
@@ -447,6 +449,13 @@ namespace NASCAR_Races
                     return (float)(alpha + Math.PI);
                 }
             }
+        }
+        public Worldinformation.CIRCUIT_PARTS WhatPartOfCircuitIsCarOn()
+        {
+            if (X < _leftCircle.X) return Worldinformation.CIRCUIT_PARTS.LEFT_TURN;
+            if (X > _rightCircle.X) return Worldinformation.CIRCUIT_PARTS.RIGHT_TURN;
+            if (Y < _worldInf.CanvasCenterY) return Worldinformation.CIRCUIT_PARTS.TOP;
+            return Worldinformation.CIRCUIT_PARTS.BOTTOM;
         }
     }
 }
