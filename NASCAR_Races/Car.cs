@@ -37,11 +37,6 @@ namespace NASCAR_Races
         Random random = new Random();
         public void Move()
         {
-            /*List<Double> points = FindCircle(_worldInfo.x2, (int)Y,                                                                           //bottom
-                                             _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)),                 //top
-                                             _worldInfo.x2 + _worldInfo.TurnRadius + _worldInfo.PenCircuitSize / 2, _worldInfo.CanvasCenterY);//turn
-            _rightCircle = new Point((int)points[0], (int)points[1]);
-            _circleRadius = (int)points[2];*/
             _rightCircle=new Point(int.MaxValue, int.MaxValue);
             _leftCircle=new Point(0,0);
             _neighbouringCars = new List<Car>();
@@ -53,12 +48,10 @@ namespace NASCAR_Races
                 var partOfCircuit = WhatPartOfCircuitIsCarOn();
                 if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM || partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
                     if (++counter >= 10)
+                    //if (true)
                     {
                         counter = 0;
                         _neighbouringCars = _worldInfo.NearbyCars(this);
-                        //if (_neighbouringCars.Count != 0)
-                        //TODO
-                        //obliczanie kola po jakim auto musi przejechac, zeby nie uderzyc w inne auto
                         int distanceToOpponentOnLeft = (int)DistanceToOpponentOnLeft();
                         switch (_worldInfo.WhatPartOfCircuitIsCarOn(this))
                         {
@@ -70,24 +63,13 @@ namespace NASCAR_Races
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.TOP:
                                 //Car will enter "left" turn
-                                //TODO
-                                //jezeli auto bedzie w tej czesci toru, musi obliczyc, czy starczy mu paliwa i opon na jeszcze jedno okrazenie
-                                //tym samym, czy musi zjechac do pitu
-                                /*points = FindCircle(_worldInfo.x1, (int)Y,                                                                          //top
-                                                    _worldInfo.x1, (int)(_worldInfo.CanvasCenterY + (_worldInfo.CanvasCenterY - Y)),                //bottom
-                                                    _worldInfo.x1 - _worldInfo.TurnRadius - _worldInfo.PenCircuitSize / 2 + distanceToOpponentOnLeft, _worldInfo.CanvasCenterY);    //turn
-                                _leftCircle = new Point((int)points[0], (int)points[1]);
-                                _circleRadius = (int)points[2];*/
-                                FindCircle((int)Y, false);
+                                FindSafeCircle((int)Y, false);
+                                //FindCircle((int)Y, false);
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                                 //Car will enter "right" turn
-                                /*points = FindCircle(_worldInfo.x2, (int)Y,                                                                          //bottom
-                                                    _worldInfo.x2, (int)(_worldInfo.CanvasCenterY - (Y - _worldInfo.CanvasCenterY)),                //top
-                                                    _worldInfo.x2 + _worldInfo.TurnRadius + _worldInfo.PenCircuitSize / 2 - distanceToOpponentOnLeft, _worldInfo.CanvasCenterY);    //turn
-                                _rightCircle = new Point((int)points[0], (int)points[1]);
-                                _circleRadius = (int)points[2];*/
-                                FindCircle((int)Y, true);
+                                FindSafeCircle((int)Y, true);
+                                //FindCircle((int)Y, true);
                                 break;
                             case Worldinformation.CIRCUIT_PARTS.PIT:
 
@@ -97,22 +79,6 @@ namespace NASCAR_Races
                 RunPhysic();
                 Thread.Sleep(10);
             }
-        }
-        //works only on straights
-        public Point FrontLeftCorner()
-        {
-            //TODO
-            //wprowadzic jakis mechanizm ktory dokona kalkulacji gdzie dokladnie znajduje sie rog; wykorzystac HeadingAngle podany w STOPPNIACH NIE RADIANACH
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.TOP) return new Point((int)(X - Length / 2), (int)(Y + Width / 2));
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.BOTTOM) return new Point((int)(X + Length / 2), (int)(Y - Width / 2));
-            return new Point();
-        }
-        //works only on straights
-        public Point ReadRightCorner()
-        {
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.TOP) return new Point((int)(X + Length / 2), (int)(Y - Width / 2));
-            if (_worldInfo.WhatPartOfCircuitIsCarOn(this) == Worldinformation.CIRCUIT_PARTS.BOTTOM) return new Point((int)(X - Length / 2), (int)(Y + Width / 2));
-            return new Point();
         }
     }
 }

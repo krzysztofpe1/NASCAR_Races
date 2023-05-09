@@ -29,15 +29,14 @@ namespace NASCAR_Races
         protected Point _rightCircle { get; set; }
         protected int _circleRadius { get; set; }
 
-        private float _turnRadius;
         private float _UseOftires = 0.5f;
 
         protected float FuelMass;
         protected float FuelCapacity;
         protected float FuelBurningRatio = 0.5f;
 
-        protected float MaxHorsePower { get; private set; }
-        protected float CurrentHorsePower;
+        public float MaxHorsePower { get; set; }
+        public float CurrentHorsePower { get; set; }
         protected float BrakesForce = 50000;
 
         protected List<Car> _neighbouringCars;
@@ -47,6 +46,7 @@ namespace NASCAR_Races
         private double currentTurnAngle = -Math.PI / 2;
 
         private Worldinformation _worldInf;
+        private int _carSafeDistance;
 
         //LOGS
         public bool isbraking = false;
@@ -57,7 +57,6 @@ namespace NASCAR_Races
             X = x;
             Y = y;
             _mass = mass;
-            _turnRadius = worldInfo.TurnRadius;
             FuelMass = fuelCapacity;
             FuelCapacity = fuelCapacity;
             _frictionofweels = frictionofweels;
@@ -66,6 +65,7 @@ namespace NASCAR_Races
             _lastExecutionTime = DateTime.Now;
 
             _worldInf = worldInfo;
+            _carSafeDistance = _worldInf.CarsSafeDistance;
         }
         // Run in the loop
         public void RunPhysic()
@@ -98,11 +98,11 @@ namespace NASCAR_Races
 
             _lastExecutionTime = currentTime;
         }
-        private void Braking(float timeTemp)
+        private void Braking(float timeElapsed)
         {
             isbraking = true;
             CurrentHorsePower = 0;
-            Speed -= timeTemp * BrakingForce() / _mass;
+            Speed -= timeElapsed * BrakingForce() / _mass;
         }
         private void notBraking()
         {
@@ -116,8 +116,6 @@ namespace NASCAR_Races
                 currentTurnAngle = CalculateEnteringAngle(rightCircleControll);
                 _recalculateHeadingAngle = true;
             }
-            //distanceToEndOfTheTrack = positionofcar - positionofBorder
-            //float r = DistanceFromPointToPoint(X, Y, circle.X, circle.Y);
             float r = _circleRadius;
 
             // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
@@ -131,6 +129,7 @@ namespace NASCAR_Races
             {
                 notBraking();
             }*/
+            
             currentTurnAngle += Speed * timeElapsed / r;
             HeadingAngle = -(float)((currentTurnAngle + Math.PI / 2) * (180.0 / Math.PI));
             // Wyznaczamy nowe współrzędne X i Y samochodu
@@ -143,36 +142,44 @@ namespace NASCAR_Races
             {
                 //TOP
                 // if car in front is slower then go to the left
-                (float, float) temp = DistanceToAndSpeedOfOpponentInFront();
-                if (temp.Item1 < float.MaxValue && temp.Item2 < Speed)
+                (float, float, float) temp = DistanceToSpeedAndHPOfOpponentInFront();
+                if (temp.Item1 < float.MaxValue && temp.Item3 < MaxHorsePower)
                 {
-                    if (DistanceToOpponentOnLeft() > 1)
+                    CurrentHorsePower = temp.Item3;
+                    if (temp.Item2 < Speed) Speed -= 0.25f;
+                    if (DistanceToOpponentOnLeft() > _carSafeDistance)
                     {
-                        Y += 0.5f;
+                        Y += 0.25f;
                     }
                 }
-                else if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
+                else if ((DistanceToOpponentOnRight() > _carSafeDistance || DistanceToOpponentOnRight() == _worldInf.DistanceToEdgeOfTrack(this)) && _worldInf.DistanceToEdgeOfTrack(this) > 1)
                 {
-                    Y -= 0.5f;
+                    CurrentHorsePower = MaxHorsePower;
+                    //notBraking();
+                    Y -= 0.25f;
                 }
                 X -= Speed * timeElapsed;
                 HeadingAngle = 0;
-                
+
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM)
             {
                 //BOTTOM
-                (float, float) temp = DistanceToAndSpeedOfOpponentInFront();
-                if (temp.Item1 < float.MaxValue && temp.Item2 < Speed)
+                (float, float, float) temp = DistanceToSpeedAndHPOfOpponentInFront();
+                if (temp.Item1 < float.MaxValue && temp.Item3 < MaxHorsePower)
                 {
-                    if (DistanceToOpponentOnLeft() > 1)
+                    CurrentHorsePower = temp.Item3;
+                    if (temp.Item2 < Speed) Speed -= 0.25f;
+                    if (DistanceToOpponentOnLeft() > _carSafeDistance)
                     {
-                        Y -= 0.5f;
+                        Y -= 0.25f;
                     }
                 }
-                else if (DistanceToOpponentOnRight() > 1 && _worldInf.DistanceToEdgeOfTrack(this) > 1)
+                else if ((DistanceToOpponentOnRight() > _carSafeDistance || DistanceToOpponentOnRight() == _worldInf.DistanceToEdgeOfTrack(this) ) && _worldInf.DistanceToEdgeOfTrack(this) > 1)
                 {
-                    Y += 0.5f;
+                    CurrentHorsePower = MaxHorsePower;
+                    //notBraking();
+                    Y += 0.25f;
                 }
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
@@ -251,25 +258,33 @@ namespace NASCAR_Races
         {
             _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
             int x;
+            float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
+            if (DistanceToOpponentOnLeft() < 1) Debug.WriteLine("EEEEEE");
+            if (DistanceToOpponentOnLeft() + 1 < distanceToEdgeOfTrackInTheMiddleOfTurn)
+            {
+                distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
+            }
             if (righCircleControl)
             {
-                float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
-                if (DistanceToOpponentOnLeft() < distanceToEdgeOfTrackInTheMiddleOfTurn)
-                {
-                    distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
-                }
                 x = _worldInf.x2 + _worldInf.TurnRadius - _circleRadius + _worldInf.PenCircuitSize / 2 - (int)distanceToEdgeOfTrackInTheMiddleOfTurn;
                 _rightCircle = new Point(x, _worldInf.CanvasCenterY);
             }
             else
             {
-                float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
-                if (DistanceToOpponentOnLeft() < distanceToEdgeOfTrackInTheMiddleOfTurn)
-                {
-                    distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
-                }
                 x = _worldInf.x1 - _worldInf.TurnRadius + _circleRadius - _worldInf.PenCircuitSize / 2 + (int)distanceToEdgeOfTrackInTheMiddleOfTurn;
                 _leftCircle = new Point(x, _worldInf.CanvasCenterY);
+            }
+        }
+        protected void FindSafeCircle(int y, bool righCircleControl)
+        {
+            _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
+            if(righCircleControl )
+            {
+                _rightCircle=new Point(_worldInf.x2, _worldInf.CanvasCenterY);
+            }
+            else
+            {
+                _leftCircle = new Point(_worldInf.x1, _worldInf.CanvasCenterY);
             }
         }
         //return:
@@ -280,7 +295,7 @@ namespace NASCAR_Races
             float distance = _worldInf.DistanceToEdgeOfTrack(this);
             foreach (Car car in _neighbouringCars)
             {
-                if (Math.Abs(X - car.X) > Length / 2 + car.Length / 2) continue;
+                if (Math.Abs(X - car.X) > Length + car.Length / 2) continue;
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
@@ -323,7 +338,7 @@ namespace NASCAR_Races
             float distance = _worldInf.DistanceToEdgeOfTrack(this, false);
             foreach (Car car in _neighbouringCars)
             {
-                if (Math.Abs(X - car.X) > Length / 2 + car.Length / 2) continue;
+                if (Math.Abs(X - car.X) > Length + car.Length / 2) continue;
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
@@ -358,7 +373,7 @@ namespace NASCAR_Races
             }
             return distance;
         }
-        protected (float, float) DistanceToAndSpeedOfOpponentInFront()
+        protected (float, float, float) DistanceToSpeedAndHPOfOpponentInFront()
         {
             float distance = float.MaxValue;
             Car tempCar = null;
@@ -367,6 +382,13 @@ namespace NASCAR_Races
                 int temp;
                 switch (WhatPartOfCircuitIsCarOn())
                 {
+                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+
+                        break;
+                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+
+
+                        break;
                     case Worldinformation.CIRCUIT_PARTS.TOP:
                         if (car.X > X) continue;
                         if (Math.Abs(car.Y - Y) > Width / 2 + car.Width / 2) continue;
@@ -391,7 +413,7 @@ namespace NASCAR_Races
                         break;
                 }
             }
-            return (distance, (tempCar != null) ? tempCar.Speed : 0);
+            return (distance, (tempCar != null) ? tempCar.Speed : float.MaxValue, (tempCar != null) ? tempCar.CurrentHorsePower : float.MaxValue);
         }
         private float CalculateEnteringAngle(bool rightTurnControl)
         {

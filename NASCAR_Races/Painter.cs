@@ -30,7 +30,7 @@ namespace NASCAR_Races
             _straightLength = worldinformation.StraightLength;
             _turnRadius = worldinformation.TurnRadius;
             _pitPosY = worldinformation.PitPosY;
-            _penCircuit = new Pen(Color.Black, worldinformation.PenCircuitSize);
+            _penCircuit = new Pen(Color.Black, worldinformation.PenCircuitSize+7);
             _penPit = new Pen(Color.Orange, worldinformation.PenCircuitSize/2);
             _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
@@ -42,14 +43,14 @@ namespace NASCAR_Races
             _turnCurveRadius = turnCurveRadius;
 
             _nextStartingPos = new Point();
-            _firstRow = _canvasHeight / 2 + _turnRadius + penCircuitSize / 4;
-            _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 4;
+            _firstRow = _canvasHeight / 2 + _turnRadius + penCircuitSize / 2;
+            _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 2;
             _nextStartingPos.X = _canvasWidth / 2 + straightLength / 4;
             _nextStartingPos.Y = _firstRow;
 
             _thread = new(CheckCollisions);
 
-            Worldinformation = new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 50, mainPictureBox);
+            Worldinformation = new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -59,7 +60,7 @@ namespace NASCAR_Races
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000, Worldinformation);
+                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
@@ -77,11 +78,24 @@ namespace NASCAR_Races
                     foreach (Car car2 in ListOfCars)
                     {
                         if (car1 == car2) continue;
+                        if (car1.IsDisposable || car2.IsDisposable) continue;
                         if (car2.State != Car.STATE.ON_CIRCUIT && (car2.State != Car.STATE.ON_WAY_TO_PIT_STOP)) continue;
                         if (Math.Abs(car1.X - car2.X) < car1.Length / 2 + car2.Length / 2 && Math.Abs(car1.Y - car2.Y) < car1.Width / 2 + car2.Width / 2)
                         {
-                            car1.IsDisposable = true;
-                            car2.IsDisposable = true;
+                            double diagonal = Math.Sqrt(Math.Pow(car1.Length, 2) + Math.Pow(car1.Width, 2));
+                            double diagonal2 = Math.Sqrt(Math.Pow(car2.Length, 2) + Math.Pow(car2.Width, 2));
+                            double angle1 = (car1.HeadingAngle + 90) % 360;
+                            double angle2 = (car2.HeadingAngle + 90) % 360;
+                            double diffAngle = Math.Abs(angle1 - angle2);
+                            if (diffAngle > 180) diffAngle = 360 - diffAngle;
+                            double distance = Math.Sqrt(Math.Pow(car2.X - car1.X, 2) + Math.Pow(car2.Y - car1.Y, 2));
+                            double diagonalSum = diagonal + diagonal2;
+                            if (distance <= diagonalSum && Math.Abs(diffAngle) < 90)
+                            {
+                                car1.IsDisposable = true;
+                                car2.IsDisposable = true;
+                                Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
+                            }
                         }
                     }
                 }
@@ -91,7 +105,7 @@ namespace NASCAR_Races
         private Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
-            _nextStartingPos.X -= _straightLength / 45;
+            _nextStartingPos.X -= _straightLength / 30;
             _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
             return tempPoint;
         }
@@ -99,7 +113,7 @@ namespace NASCAR_Races
         public void StartRace()
         {
             ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
-            //_thread.Start();
+            _thread.Start();
         }
 
         public void KillThreads()

@@ -23,6 +23,8 @@ namespace NASCAR_Races
         public int PenCarSize { get; }
         public int CarViewingRadius { get; }
 
+        public int CarsSafeDistance { get; } = 10;
+
         public int x1;
         public int x2;
 
