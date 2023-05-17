@@ -79,26 +79,6 @@ namespace NASCAR_Races
             //Console.Clear();
             //listOfCars.ForEach(car => { WriteLogs(car); });
         }
-        public void WriteLogs(Car car)
-        {
-            //Console.Clear();
-            Console.WriteLine();
-            if (car.isbraking)
-            {
-                Console.WriteLine("IsBraking");
-            }
-            else
-            {
-                Console.WriteLine("NotBraking");
-            }
-            Console.WriteLine("Speed " + car.Speed);
-            Console.WriteLine("Acceleration: " + car._currentAcceleration);
-            if (car.Speed < 0)
-            {
-                Console.WriteLine("error");
-            }
-            Console.WriteLine();
-        }
 
         private void PaintCar(Graphics g, Car car)
         {

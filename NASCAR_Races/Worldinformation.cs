@@ -24,6 +24,9 @@ namespace NASCAR_Races
         public int CarViewingRadius { get; }
 
         public int CarsSafeDistance { get; } = 10;
+        public int CarPitStopEntryOffset { get; private set; }
+        public int CarLength { get; } = 15;
+        public int CarWidth { get; } = 10;
 
         public int x1;
         public int x2;
@@ -48,6 +51,8 @@ namespace NASCAR_Races
             PenCircuitSize = penCircuitSize;
             PenCarSize = penCarSize;
             CarViewingRadius = carViewingRadius;
+
+            CarPitStopEntryOffset = PenCircuitSize / 3;
         }
 
         //returns List<Car> that are in CarViewingRadius of callerCar

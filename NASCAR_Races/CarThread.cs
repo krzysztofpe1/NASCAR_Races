@@ -9,8 +9,9 @@ namespace NASCAR_Races
     public class CarThread : Car
     {
         private Thread _thread;
-        public CarThread(Point point, float weight, float fuelCapacity, string carName, float maxHorsePower, Worldinformation worldinformation) : base(point.X, point.Y, weight, fuelCapacity, carName, maxHorsePower, worldinformation)
+        public CarThread(Point point, Point pitPos, float weight, float fuelCapacity, string carName, float maxHorsePower, Worldinformation worldinformation) : base(point.X, point.Y, weight, fuelCapacity, carName, maxHorsePower, worldinformation)
         {
+            _pitPos = pitPos;
             _thread = new(this.Move);
             _thread.Start();
         }

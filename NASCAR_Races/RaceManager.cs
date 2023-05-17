@@ -23,6 +23,7 @@ namespace NASCAR_Races
         private int _turnCurveRadius;
 
         private Point _nextStartingPos;
+        private Point _nextPitPos;
         private int _firstRow;
         private int _secondRow;
 
@@ -48,9 +49,14 @@ namespace NASCAR_Races
             _nextStartingPos.X = _canvasWidth / 2 + straightLength / 4;
             _nextStartingPos.Y = _firstRow;
 
+
             _thread = new(CheckCollisions);
 
             Worldinformation = new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
+
+            _nextPitPos = new Point();
+            _nextPitPos.Y = pitPosY - penCircuitSize / 4;
+            _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
@@ -60,7 +66,7 @@ namespace NASCAR_Races
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
+                CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
@@ -108,6 +114,12 @@ namespace NASCAR_Races
             _nextStartingPos.X -= _straightLength / 30;
             _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
             return tempPoint;
+        }
+        private Point NextPitPoint()
+        {
+            Point temp = new(_nextPitPos.X, _nextPitPos.Y);
+            _nextPitPos.X -= Worldinformation.CarLength * 2;
+            return temp;
         }
 
         public void StartRace()
