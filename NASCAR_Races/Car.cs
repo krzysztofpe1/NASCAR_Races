@@ -16,7 +16,7 @@ namespace NASCAR_Races
         public string CarName { get; private set; }
 
         private Worldinformation _worldInfo;
-        public Car(float x, float y, float weight, float fuelCapacity, string carName, float maxHorsePower, Worldinformation worldInfo) : base(x, y, weight, fuelCapacity, 0.3f, maxHorsePower, worldInfo)
+        public Car(float x, float y, float weight, string carName, float maxHorsePower, Worldinformation worldInfo) : base(x, y, weight, 0.3f, maxHorsePower, worldInfo)
         {
             CarName = carName;
             _worldInfo = worldInfo;
@@ -48,18 +48,17 @@ namespace NASCAR_Races
 
                             break;
                         case Worldinformation.CIRCUIT_PARTS.TOP:
-                            State = STATE.ON_WAY_TO_PIT_STOP;
                             //Car will enter "left" turn
-                            FindSafeCircle((int)Y, false);
-                            //FindCircle((int)Y, false);
+                            if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, false);
+                            else FindCircle((int)Y, false);
                             break;
                         case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                             //Car will enter "right" turn
-                            FindSafeCircle((int)Y, true);
-                            //FindCircle((int)Y, true);
+                            if(_neighbouringCars.Count > 0)FindSafeCircle((int)Y, true);
+                            else FindCircle((int)Y, true);
                             break;
                         case Worldinformation.CIRCUIT_PARTS.PIT:
-                            State = STATE.PIT_STOP;
+                            State = STATE.PIT;
                             FindSafeCircle((int)Y, true);
                             break;
                     }

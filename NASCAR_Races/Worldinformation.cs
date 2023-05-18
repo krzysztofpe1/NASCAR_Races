@@ -25,6 +25,8 @@ namespace NASCAR_Races
 
         public int CarsSafeDistance { get; } = 10;
         public int CarPitStopEntryOffset { get; private set; }
+        public int CarMaxSpeedInPit { get; } = 40;
+        public int CarInitialFuelMass { get; } = 40;
         public int CarLength { get; } = 15;
         public int CarWidth { get; } = 10;
 

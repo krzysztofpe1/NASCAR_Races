@@ -66,7 +66,7 @@ namespace NASCAR_Races
             ListOfCars = new List<Car>();
             for (int i = 0; i < numberOfCars; i++)
             {
-                CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, 70, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
+                CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
@@ -85,7 +85,6 @@ namespace NASCAR_Races
                     {
                         if (car1 == car2) continue;
                         if (car1.IsDisposable || car2.IsDisposable) continue;
-                        if (car2.State != Car.STATE.ON_CIRCUIT && (car2.State != Car.STATE.ON_WAY_TO_PIT_STOP)) continue;
                         if (Math.Abs(car1.X - car2.X) < car1.Length / 2 + car2.Length / 2 && Math.Abs(car1.Y - car2.Y) < car1.Width / 2 + car2.Width / 2)
                         {
                             double diagonal = Math.Sqrt(Math.Pow(car1.Length, 2) + Math.Pow(car1.Width, 2));

@@ -32,9 +32,8 @@ namespace NASCAR_Races
 
         private float _UseOftires = 0.5f;
 
-        protected float FuelMass;
-        protected float FuelCapacity;
-        protected float FuelBurningRatio = 0.5f;
+        public float FuelMass { get; private set; }
+        protected float FuelBurningRatio = 0.00001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
@@ -55,20 +54,19 @@ namespace NASCAR_Races
             ON_CIRCUIT,
             OFF_CIRCUIT,
             ON_WAY_TO_PIT_STOP,
-            PIT_STOP
+            PIT,
+            PIT_STOPPED
         }
 
         public STATE State { get; protected set; } = STATE.ON_CIRCUIT;
 
-        public Physics(float x, float y, float mass, float fuelCapacity, float frictionofweels, float maxHorsePower, Worldinformation worldInfo)
+        public Physics(float x, float y, float mass, float frictionofweels, float maxHorsePower, Worldinformation worldInfo)
         {
             X = x;
             Y = y;
             Length = worldInfo.CarLength;
             Width = worldInfo.CarWidth;
             _mass = mass;
-            FuelMass = fuelCapacity;
-            FuelCapacity = fuelCapacity;
             _frictionofweels = frictionofweels;
             MaxHorsePower = maxHorsePower;
             CurrentHorsePower = MaxHorsePower;
@@ -76,12 +74,14 @@ namespace NASCAR_Races
 
             _worldInf = worldInfo;
             _carSafeDistance = _worldInf.CarsSafeDistance;
+            FuelMass = _worldInf.CarInitialFuelMass;
         }
         // Run in the loop
         public void RunPhysic()
         {
             DateTime currentTime = DateTime.Now;
             TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
+            _lastExecutionTime = currentTime;
             timeSinceLastExecution *= 1.5;
             //float FF = FrictionForce(); // siła która przeciwdziała sile dośrodkowej
             float wheelFriction = 60;
@@ -105,7 +105,10 @@ namespace NASCAR_Races
                 MoveCarOnStraight((float)timeSinceLastExecution.TotalSeconds, partOfCircuit);
                 _recalculateHeadingAngle = true;
             }
-            _lastExecutionTime = currentTime;
+            //Managing Fuel
+            FuelMass -= (float)(CurrentHorsePower * FuelBurningRatio * timeSinceLastExecution.TotalSeconds);
+            if (FuelMass < _worldInf.CarInitialFuelMass / 4) State = STATE.ON_WAY_TO_PIT_STOP;
+            else State = STATE.ON_CIRCUIT;
         }
         private void MoveCarOnCircle(float timeElapsed, bool rightCircleControll, Point circle)
         {
@@ -116,21 +119,12 @@ namespace NASCAR_Races
             }
             float r = _circleRadius;
 
-            // Wyznaczamy nowy kąt, uwzględniając czas i prędkość
             float a = circle.X;
             float b = circle.Y;
-            /*if (IscentrifugalForce(_circleRadius) != 0)
-            {
-                Braking(timeElapsed);
-            }
-            else
-            {
-                notBraking();
-            }*/
 
             currentTurnAngle += Speed * timeElapsed / r;
             HeadingAngle = -(float)((currentTurnAngle + Math.PI / 2) * (180.0 / Math.PI));
-            // Wyznaczamy nowe współrzędne X i Y samochodu
+
             X = a + r * (float)Math.Cos(-currentTurnAngle);
             Y = b + r * (float)Math.Sin(-currentTurnAngle);
         }
@@ -139,7 +133,7 @@ namespace NASCAR_Races
             if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
             {
                 //TOP
-                if(State == STATE.ON_WAY_TO_PIT_STOP)
+                if (State == STATE.ON_WAY_TO_PIT_STOP)
                 {
                     if (DistanceToOpponentOnLeft() > 1)
                     {
@@ -200,6 +194,16 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
+                if (Speed > _worldInf.CarMaxSpeedInPit)
+                {
+                    CurrentHorsePower = 0;
+                    Speed -= 1f;
+                }
+                else
+                {
+                    CurrentHorsePower = MaxHorsePower;
+                    Speed += 0.25f;
+                }
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
             }
@@ -271,10 +275,14 @@ namespace NASCAR_Races
         }
         protected void FindCircle(int y, bool righCircleControl)
         {
+            if (State == STATE.ON_WAY_TO_PIT_STOP && !righCircleControl)
+            {
+                FindSafeCircle(y, righCircleControl);
+                return;
+            }
             _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
             int x;
             float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
-            if (DistanceToOpponentOnLeft() < 1) Debug.WriteLine("EEEEEE");
             if (DistanceToOpponentOnLeft() + 1 < distanceToEdgeOfTrackInTheMiddleOfTurn)
             {
                 distanceToEdgeOfTrackInTheMiddleOfTurn -= Width;
@@ -295,10 +303,10 @@ namespace NASCAR_Races
             if (State == STATE.ON_WAY_TO_PIT_STOP && !righCircleControl)
             {
                 _circleRadius = Math.Abs(y - _worldInf.PitPosY) / 2;
-                _leftCircle = new Point(_worldInf.x1 - ((_worldInf.DistanceToEdgeOfTrack(this, false)<_worldInf.CarPitStopEntryOffset) ? _worldInf.CarPitStopEntryOffset : 0), y + _circleRadius);
+                _leftCircle = new Point(_worldInf.x1 - ((_worldInf.DistanceToEdgeOfTrack(this, false) < _worldInf.CarPitStopEntryOffset) ? _worldInf.CarPitStopEntryOffset : 0), y + _circleRadius);
                 return;
             }
-            else if (State == STATE.PIT_STOP)
+            else if (State == STATE.PIT)
             {
                 _circleRadius = (_worldInf.PitPosY - (_worldInf.CanvasCenterY - _worldInf.TurnRadius + _worldInf.PenCircuitSize / 2)) / 2;
                 _rightCircle = new Point(_worldInf.x2 + _worldInf.CarPitStopEntryOffset, y - _circleRadius);
@@ -480,7 +488,7 @@ namespace NASCAR_Races
             if (X < _leftCircle.X) return Worldinformation.CIRCUIT_PARTS.LEFT_TURN;
             if (X > _rightCircle.X) return Worldinformation.CIRCUIT_PARTS.RIGHT_TURN;
             if (Y < _worldInf.CanvasCenterY) return Worldinformation.CIRCUIT_PARTS.TOP;
-            if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize) return Worldinformation.CIRCUIT_PARTS.PIT;
+            if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize / 4) return Worldinformation.CIRCUIT_PARTS.PIT;
             return Worldinformation.CIRCUIT_PARTS.BOTTOM;
         }
 
