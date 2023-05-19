@@ -56,7 +56,7 @@ namespace NASCAR_Races
 
             _nextPitPos = new Point();
             _nextPitPos.Y = pitPosY - penCircuitSize / 4;
-            _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
+            _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength -200;
         }
 
         public List<Car> CreateListOfCars(int numberOfCars)
