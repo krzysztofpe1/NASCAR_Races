@@ -23,8 +23,7 @@ namespace NASCAR_Races
             _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, mainPictureBox);
             _painter = new(_raceManager.Worldinformation);
             
-            int numberOfCars = 10;
-            _painter.listOfCars = _raceManager.CreateListOfCars(numberOfCars);
+            _painter.listOfCars = _raceManager.CreateListOfCars();
 
             programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)
             programTimer.Tick += new EventHandler(RunRace);

@@ -21,8 +21,10 @@ namespace NASCAR_Races
         public Point InnerBounds { get; }
         public int PenCircuitSize { get; }
         public int PenCarSize { get; }
-        public int CarViewingRadius { get; }
 
+        public int NumberOfCars { get; } = 15;
+
+        public int CarViewingRadius { get; }
         public int CarsSafeDistance { get; } = 10;
         public int CarPitStopEntryOffset { get; private set; }
         public int CarMaxSpeedInPit { get; } = 40;
@@ -63,7 +65,7 @@ namespace NASCAR_Races
             List<Car> res = new List<Car>();
             ListOfCars.ForEach(car =>
             {
-                if (callerCar != car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2))
+                if (callerCar != car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2) && car.IsDisposable != true)
                 {
                     res.Add(car);
                 }

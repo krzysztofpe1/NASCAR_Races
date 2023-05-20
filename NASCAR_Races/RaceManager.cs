@@ -59,12 +59,12 @@ namespace NASCAR_Races
             _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
         }
 
-        public List<Car> CreateListOfCars(int numberOfCars)
+        public List<Car> CreateListOfCars()
         {
             Random random = new Random();
             ListOfCarThreads = new List<CarThread>();
             ListOfCars = new List<Car>();
-            for (int i = 0; i < numberOfCars; i++)
+            for (int i = 0; i < Worldinformation.NumberOfCars; i++)
             {
                 CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
                 ListOfCarThreads.Add(car);
@@ -126,7 +126,6 @@ namespace NASCAR_Races
             ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
             _thread.Start();
         }
-
         public void KillThreads()
         {
             _killCollisionChecker = true;

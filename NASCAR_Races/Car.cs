@@ -54,7 +54,7 @@ namespace NASCAR_Races
                             break;
                         case Worldinformation.CIRCUIT_PARTS.BOTTOM:
                             //Car will enter "right" turn
-                            if(_neighbouringCars.Count > 0)FindSafeCircle((int)Y, true);
+                            if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, true);
                             else FindCircle((int)Y, true);
                             break;
                         case Worldinformation.CIRCUIT_PARTS.PIT:
