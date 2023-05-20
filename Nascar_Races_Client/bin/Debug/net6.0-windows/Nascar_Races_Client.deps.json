@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Nascar_Races_Client/1.0.0": {
+        "runtime": {
+          "Nascar_Races_Client.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Nascar_Races_Client/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
