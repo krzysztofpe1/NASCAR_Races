@@ -2,6 +2,7 @@
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Microsoft.VisualBasic.Logging;
 
 namespace NASCAR_Races
 {
@@ -23,7 +24,10 @@ namespace NASCAR_Races
         public float _currentAcceleration;
         private float _mass;
         private float _frictionofweels;
+        private bool _turnToPit = false;
         private System.DateTime _lastExecutionTime;
+        private float _previosAtanPit =0;
+        private float _currentAtanPit =0;
 
         protected Point _leftCircle { get; set; }
         protected Point _rightCircle { get; set; }
@@ -33,7 +37,7 @@ namespace NASCAR_Races
         private float _UseOftires = 0.5f;
 
         public float FuelMass { get; private set; }
-        protected float FuelBurningRatio = 0.00001f;
+        protected float FuelBurningRatio = 0.001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
@@ -43,7 +47,7 @@ namespace NASCAR_Races
 
         protected bool _recalculateHeadingAngle { get; set; } = true;
         protected bool _recalculatePit { get; set; } = true;
-
+        
         private double currentTurnAngle = -Math.PI / 2;
 
         private Worldinformation _worldInf;
@@ -130,6 +134,7 @@ namespace NASCAR_Races
         }
         private void MoveCarOnStraight(float timeElapsed, Worldinformation.CIRCUIT_PARTS partOfCircuit)
         {
+            CurrentHorsePower = MaxHorsePower;
             if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
             {
                 //TOP
@@ -194,6 +199,11 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
+                
+                if (Y < 505 && _pitPos.X - 100 > X)
+                {
+                    Y++;
+                }
                 if (Speed > _worldInf.CarMaxSpeedInPit)
                 {
                     CurrentHorsePower = 0;
@@ -204,8 +214,37 @@ namespace NASCAR_Races
                     CurrentHorsePower = MaxHorsePower;
                     Speed += 0.25f;
                 }
+
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
+                //float prevatn = 0;
+
+                // do góry przed pitem
+                if (X  > _pitPos.X - 100 && X < _pitPos.X && (int)Y > (int)_pitPos.Y + 5)
+                {
+                    _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + 50)) / 20.0) + Math.PI / 2) * 7;
+                    Y = Y - (_currentAtanPit - _previosAtanPit);
+                    _previosAtanPit = _currentAtanPit;
+                    //Y -= 3;
+                }
+                // w dol po picie
+                else if (X > _pitPos.X && (int)Y < 505)
+                {
+                    _currentAtanPit = (float)(Math.Atan((X - (_pitPos.X + 50)) / 10.0) + Math.PI / 2) * 7;
+                    Y = Y + (_currentAtanPit - _previosAtanPit);
+                    _previosAtanPit = _currentAtanPit;
+                    //Y += 3;
+                }
+                else { _previosAtanPit = 0; }
+                if (X >= _pitPos.X - 1 && X <= _pitPos.X + 1 && FuelMass+5 < _worldInf.CarInitialFuelMass)
+                {
+                    State = STATE.PIT_STOPPED;
+                    Thread.Sleep(1000);
+                    FuelMass = _worldInf.CarInitialFuelMass;
+                    _previosAtanPit = 0;
+                    _lastExecutionTime = DateTime.Now;
+                }
+
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
@@ -280,6 +319,7 @@ namespace NASCAR_Races
                 FindSafeCircle(y, righCircleControl);
                 return;
             }
+
             _circleRadius = Math.Abs(y - _worldInf.CanvasCenterY);
             int x;
             float distanceToEdgeOfTrackInTheMiddleOfTurn = _worldInf.DistanceToEdgeOfTrack(this, false);
@@ -308,7 +348,7 @@ namespace NASCAR_Races
             }
             else if (State == STATE.PIT)
             {
-                _circleRadius = (_worldInf.PitPosY - (_worldInf.CanvasCenterY - _worldInf.TurnRadius + _worldInf.PenCircuitSize / 2)) / 2;
+                _circleRadius = 10 + (_worldInf.PitPosY - (_worldInf.CanvasCenterY - _worldInf.TurnRadius + _worldInf.PenCircuitSize / 2)) / 2;
                 _rightCircle = new Point(_worldInf.x2 + _worldInf.CarPitStopEntryOffset, y - _circleRadius);
                 return;
             }
