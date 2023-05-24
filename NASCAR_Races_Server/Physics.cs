@@ -46,7 +46,7 @@ namespace NASCAR_Races
         private float _UseOftires = 0.5f;
 
         public float FuelMass { get; private set; }
-        protected float FuelBurningRatio = 0.0001f;
+        protected float FuelBurningRatio = 0.001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
@@ -92,10 +92,11 @@ namespace NASCAR_Races
         // Run in the loop
         public void RunPhysic()
         {
+            State = STATE.PIT;
             DateTime currentTime = DateTime.Now;
             TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
             _lastExecutionTime = currentTime;
-            //timeSinceLastExecution *= 1.5;
+            //timeSinceLastExecution *= 2;
             //float FF = FrictionForce(); // siła która przeciwdziała sile dośrodkowej
             float wheelFriction = 60;
             float airR = AirResistance();
@@ -212,8 +213,6 @@ namespace NASCAR_Races
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
                 int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4 - (int)Length / 2;
-                //int bottomBorderPit = 505;
-                Debug.WriteLine(bottomBorderPit + " " + _worldInf.PitPosY);
                 if (Y < bottomBorderPit && _pitPos.X - 100 > X)
                 {
                     Y++;
@@ -231,10 +230,55 @@ namespace NASCAR_Races
 
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
-                //float prevatn = 0;
+
+                double distanceToPit = _pitPos.X - X;
+                if (distanceToPit < _worldInf.CarLengthOfPittingManouver - 2 && distanceToPit > 0)
+                {
+                    //AcrTan in <-2;2> interval; Value: <Atan(-2);Atan(2)>
+                    double temp = Math.Atan(((double)_worldInf.CarLengthOfPittingManouver / 2 - distanceToPit) / (double)_worldInf.CarLengthOfPittingManouver * 4);
+                    //Value: <0;Atan(2)>
+                    temp -= Math.Atan(-2);
+                    //Value: <0;1>
+                    temp /= Math.Atan(2);
+                    //Value: <0;_worldInf.CarWidthOfPittingManouver)
+                    temp *= _worldInf.CarWidthOfPittingManouver;
+                    //Debug.WriteLine(temp);
+                    Y = (float)(bottomBorderPit - temp);
+                }
+                if (distanceToPit <= 2 && distanceToPit >= -2)
+                {
+                    State = STATE.PIT_STOPPED;
+                    FuelMass = _worldInf.CarInitialFuelMass;
+                    Thread.Sleep(1000);
+                    X += 4;
+                    _lastExecutionTime = DateTime.Now;
+                }
+                else if (distanceToPit < 0 && distanceToPit + _worldInf.CarLengthOfPittingManouver / 2 > 0)
+                {
+                    //AcrTan in <-2;2> interval; Value: <Atan(-2);Atan(2)>
+                    double temp = Math.Atan(((double)_worldInf.CarLengthOfPittingManouver / 2 - distanceToPit) / (double)_worldInf.CarLengthOfPittingManouver * 4);
+                    //Reverting ArcTan
+                    temp *= -1;
+                    Debug.WriteLine(temp);
+                    //Value: <0;Atan(-2)>
+                    temp -= Math.Atan(2);
+                    //Value: <0;1>
+                    temp /= Math.Atan(-2);
+                    //Value: <0;_worldInf.CarWidthOfPittingManouver)
+                    temp *= _worldInf.CarWidthOfPittingManouver / 2;
+                    //Debug.WriteLine(temp);
+                    Y = (float)(bottomBorderPit - temp);
+                }
+
+
+
+
+
+
+
 
                 // do góry przed pitem
-                int manover_size = (int)Length * 2;
+                /*int manover_size = (int)Length * 2;
                 if (X > _pitPos.X - manover_size && X < _pitPos.X && (int)Y > (int)_pitPos.Y)
                 {
                     _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + manover_size / 2)) / 20.0) + Math.PI / 2) * 6;
@@ -260,7 +304,7 @@ namespace NASCAR_Races
                     FuelMass = _worldInf.CarInitialFuelMass;
                     _previosAtanPit = 0;
                     _lastExecutionTime = DateTime.Now;
-                }
+                }*/
 
             }
 

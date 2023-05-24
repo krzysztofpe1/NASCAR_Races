@@ -22,7 +22,7 @@ namespace NASCAR_Races
         public int PenCircuitSize { get; }
         public int PenCarSize { get; }
 
-        public int NumberOfCars { get; } = 10;
+        public int NumberOfCars { get; } = 1;
 
         public int CarViewingRadius { get; }
         public int CarsSafeDistance { get; } = 10;
@@ -31,6 +31,9 @@ namespace NASCAR_Races
         public int CarInitialFuelMass { get; } = 40;
         public int CarLength { get; } = 15;
         public int CarWidth { get; } = 10;
+
+        public int CarLengthOfPittingManouver { get; private set; }
+        public int CarWidthOfPittingManouver { get; set; }
 
         public int x1;
         public int x2;
@@ -57,6 +60,7 @@ namespace NASCAR_Races
             CarViewingRadius = carViewingRadius;
 
             CarPitStopEntryOffset = PenCircuitSize / 3;
+            CarLengthOfPittingManouver = CarLength * 10;
         }
 
         //returns List<Car> that are in CarViewingRadius of callerCar
@@ -91,33 +95,6 @@ namespace NASCAR_Races
             if (y < CanvasCenterY) return CIRCUIT_PARTS.TOP;
             if (y > CanvasCenterY) return CIRCUIT_PARTS.BOTTOM;
             return CIRCUIT_PARTS.PIT;
-        }
-
-        public bool IsInBoundsOfCircuit(Car car)
-        {
-            return IsInBoundsOfCircuit(car.X, car.Y);
-        }
-        public bool IsInBoundsOfCircuit(float x, float y)
-        {
-            return false;
-        }
-        public List<Point> PerfectTurnCirclePoints(bool rightCircle = true)
-        {
-            List<Point> points = new List<Point>();
-            if (rightCircle)
-            {
-                points.Add(new Point(x2, CanvasCenterY + TurnRadius + PenCircuitSize / 2 - PenCircuitSize / 4));//dol
-                points.Add(new Point(x2, CanvasCenterY - TurnRadius - PenCircuitSize / 2 + PenCircuitSize / 4));//gora
-                points.Add(new Point(x2 + TurnRadius - PenCircuitSize / 2, CanvasCenterY + PenCircuitSize / 4));//prawo
-            }
-            else
-            {
-                points.Add(new Point(x1, CanvasCenterY + TurnRadius + PenCircuitSize / 2 - PenCircuitSize / 4));//dol
-                points.Add(new Point(x1, CanvasCenterY - TurnRadius - PenCircuitSize / 2 + PenCircuitSize / 4));//gora
-                points.Add(new Point(x1 - TurnRadius + PenCircuitSize / 2, CanvasCenterY - PenCircuitSize / 4));//lewo
-            }
-
-            return points;
         }
         public float DistanceToEdgeOfTrack(Physics car, bool outerEdge = true)
         {
