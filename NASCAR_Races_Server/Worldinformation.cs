@@ -22,7 +22,7 @@ namespace NASCAR_Races
         public int PenCircuitSize { get; }
         public int PenCarSize { get; }
 
-        public int NumberOfCars { get; } = 15;
+        public int NumberOfCars { get; } = 10;
 
         public int CarViewingRadius { get; }
         public int CarsSafeDistance { get; } = 10;

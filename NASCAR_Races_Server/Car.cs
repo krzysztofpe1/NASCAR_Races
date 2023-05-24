@@ -32,7 +32,7 @@ namespace NASCAR_Races
             {
                 if (!Started) continue;
                 //refreshing neighbouring cars list every 10 iterations
-                if (++counter >= 10)
+                if (++counter >= 5)
                 //if (true)
                 {
                     counter = 0;

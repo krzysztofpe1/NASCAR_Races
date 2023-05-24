@@ -12,7 +12,16 @@ namespace NASCAR_Races
         public float Y { get; private set; } = 0;
         public float Length { get; private set; }
         public float Width { get; private set; }
-        public float Speed { get; private set; } = 0;
+        private float _speed;
+        public float Speed
+        {
+            get { return _speed; }
+            private set
+            {
+                if (value < 0) _speed = 0;
+                else _speed = value;
+            }
+        }
         public float HeadingAngle { get; set; } = 0;
 
         const float accelerationOfGravity = 9.81f;
@@ -37,7 +46,7 @@ namespace NASCAR_Races
         private float _UseOftires = 0.5f;
 
         public float FuelMass { get; private set; }
-        protected float FuelBurningRatio = 0.001f;
+        protected float FuelBurningRatio = 0.0001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
@@ -86,7 +95,7 @@ namespace NASCAR_Races
             DateTime currentTime = DateTime.Now;
             TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
             _lastExecutionTime = currentTime;
-            timeSinceLastExecution *= 1.5;
+            //timeSinceLastExecution *= 1.5;
             //float FF = FrictionForce(); // siła która przeciwdziała sile dośrodkowej
             float wheelFriction = 60;
             float airR = AirResistance();
@@ -140,7 +149,7 @@ namespace NASCAR_Races
                 //TOP
                 if (State == STATE.ON_WAY_TO_PIT_STOP)
                 {
-                    if (DistanceToOpponentOnLeft() > 1)
+                    if (DistanceToOpponentOnLeft() > _carSafeDistance)
                     {
                         Y += 0.25f;
                         CurrentHorsePower = MaxHorsePower;
@@ -148,8 +157,10 @@ namespace NASCAR_Races
                     else if (_worldInf.DistanceToEdgeOfTrack(this, false) > 1)
                     {
                         CurrentHorsePower = 0;
-                        Speed -= 0.25f;
+                        (float, float, float) opponentInFront = DistanceToSpeedAndHPOfOpponentInFront();
+                        if (opponentInFront.Item1 < _worldInf.CarsSafeDistance || opponentInFront.Item2 < Speed) Speed -= 0.25f;
                     }
+                    else CurrentHorsePower = MaxHorsePower;
                     X -= Speed * timeElapsed;
                     HeadingAngle = 0;
                     return;
@@ -171,6 +182,7 @@ namespace NASCAR_Races
                     //notBraking();
                     Y -= 0.25f;
                 }
+                else Debug.WriteLine("Out of context");
                 X -= Speed * timeElapsed;
                 HeadingAngle = 0;
 
@@ -199,8 +211,8 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
-                //int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4;
-                int bottomBorderPit = 505;
+                int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4 - (int)Length / 2;
+                //int bottomBorderPit = 505;
                 Debug.WriteLine(bottomBorderPit + " " + _worldInf.PitPosY);
                 if (Y < bottomBorderPit && _pitPos.X - 100 > X)
                 {
@@ -222,7 +234,7 @@ namespace NASCAR_Races
                 //float prevatn = 0;
 
                 // do góry przed pitem
-                int manover_size = 50;
+                int manover_size = (int)Length * 2;
                 if (X > _pitPos.X - manover_size && X < _pitPos.X && (int)Y > (int)_pitPos.Y)
                 {
                     _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + manover_size / 2)) / 20.0) + Math.PI / 2) * 6;
@@ -433,7 +445,7 @@ namespace NASCAR_Races
                         if (car.Y > Y)
                         {
                             //opponent is on the left side of this car
-                            temp = car.Y - car.Width / 2 - Y + Width / 2;
+                            temp = car.Y - car.Width / 2 - (Y + Width / 2);
                             if (temp < distance) distance = temp;
                         }
                         break;
@@ -442,7 +454,7 @@ namespace NASCAR_Races
                         if (car.Y < Y)
                         {
                             //opponent is on the left side of this car
-                            temp = Y - Width / 2 - car.Y + car.Width / 2;
+                            temp = Y - Width / 2 - (car.Y + car.Width / 2);
                             if (temp < distance) distance = temp;
                         }
                         break;
