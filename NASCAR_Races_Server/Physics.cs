@@ -199,8 +199,10 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
-
-                if (Y < 505 && _pitPos.X - 100 > X)
+                //int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4;
+                int bottomBorderPit = 505;
+                Debug.WriteLine(bottomBorderPit + " " + _worldInf.PitPosY);
+                if (Y < bottomBorderPit && _pitPos.X - 100 > X)
                 {
                     Y++;
                 }
@@ -228,7 +230,7 @@ namespace NASCAR_Races
                     _previosAtanPit = _currentAtanPit;
                 }
                 // w dol po picie
-                else if (X > _pitPos.X && (int)Y < 505)
+                else if (X > _pitPos.X && (int)Y < bottomBorderPit)
                 {
                     _currentAtanPit = (float)(Math.Atan((X - (_pitPos.X + manover_size / 2)) / 10.0) + Math.PI / 2) * 6;
                     Y = Y + (_currentAtanPit - _previosAtanPit);
