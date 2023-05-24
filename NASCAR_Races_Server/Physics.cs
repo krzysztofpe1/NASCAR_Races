@@ -26,8 +26,8 @@ namespace NASCAR_Races
         private float _frictionofweels;
         private bool _turnToPit = false;
         private System.DateTime _lastExecutionTime;
-        private float _previosAtanPit =0;
-        private float _currentAtanPit =0;
+        private float _previosAtanPit = 0;
+        private float _currentAtanPit = 0;
 
         protected Point _leftCircle { get; set; }
         protected Point _rightCircle { get; set; }
@@ -47,7 +47,7 @@ namespace NASCAR_Races
 
         protected bool _recalculateHeadingAngle { get; set; } = true;
         protected bool _recalculatePit { get; set; } = true;
-        
+
         private double currentTurnAngle = -Math.PI / 2;
 
         private Worldinformation _worldInf;
@@ -199,7 +199,7 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
-                
+
                 if (Y < 505 && _pitPos.X - 100 > X)
                 {
                     Y++;
@@ -220,23 +220,26 @@ namespace NASCAR_Races
                 //float prevatn = 0;
 
                 // do góry przed pitem
-                if (X  > _pitPos.X - 100 && X < _pitPos.X && (int)Y > (int)_pitPos.Y + 5)
+                int manover_size = 50;
+                if (X > _pitPos.X - manover_size && X < _pitPos.X && (int)Y > (int)_pitPos.Y)
                 {
-                    _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + 50)) / 20.0) + Math.PI / 2) * 7;
+                    _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + manover_size / 2)) / 20.0) + Math.PI / 2) * 6;
                     Y = Y - (_currentAtanPit - _previosAtanPit);
                     _previosAtanPit = _currentAtanPit;
-                    //Y -= 3;
                 }
                 // w dol po picie
                 else if (X > _pitPos.X && (int)Y < 505)
                 {
-                    _currentAtanPit = (float)(Math.Atan((X - (_pitPos.X + 50)) / 10.0) + Math.PI / 2) * 7;
+                    _currentAtanPit = (float)(Math.Atan((X - (_pitPos.X + manover_size / 2)) / 10.0) + Math.PI / 2) * 6;
                     Y = Y + (_currentAtanPit - _previosAtanPit);
                     _previosAtanPit = _currentAtanPit;
-                    //Y += 3;
                 }
                 else { _previosAtanPit = 0; }
-                if (X >= _pitPos.X - 1 && X <= _pitPos.X + 1 && FuelMass+5 < _worldInf.CarInitialFuelMass)
+                if (_pitPos.Y > Y)
+                {
+                    Debug.WriteLine("Error: ");
+                }
+                if (X >= _pitPos.X - 1 && X <= _pitPos.X + 1 && FuelMass + 5 < _worldInf.CarInitialFuelMass)
                 {
                     State = STATE.PIT_STOPPED;
                     Thread.Sleep(1000);
