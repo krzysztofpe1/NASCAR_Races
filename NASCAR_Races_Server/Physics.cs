@@ -8,6 +8,11 @@ namespace NASCAR_Races
 {
     public class Physics
     {
+        const float accelerationOfGravity = 9.81f;
+        const float trackAngle = 0.175f;
+        const float airDensity = 1.225f;
+        const float frontSurface = 2.5f;
+        const float carAirDynamic = 0.35f;
         public float X { get; private set; } = 0;
         public float Y { get; private set; } = 0;
         public float Length { get; private set; }
@@ -23,44 +28,32 @@ namespace NASCAR_Races
             }
         }
         public float HeadingAngle { get; set; } = 0;
-
-        const float accelerationOfGravity = 9.81f;
-        const float trackAngle = 0.175f;
-        const float airDensity = 1.225f;
-        const float frontSurface = 2.5f;
-        const float carAirDynamic = 0.35f;
+        
         //change to private for logs only
-        public float _currentAcceleration;
-        private float _mass;
-        private float _frictionofweels;
-        private bool _turnToPit = false;
-        private System.DateTime _lastExecutionTime;
-        private float _previosAtanPit = 0;
-        private float _currentAtanPit = 0;
+        public float _currentAcceleration { get; private set; }
+        private float _mass { get; set; }
+        private float _frictionofweels { get; set; }
+        private System.DateTime _lastExecutionTime { get; set; }
 
         protected Point _leftCircle { get; set; }
         protected Point _rightCircle { get; set; }
         protected int _circleRadius { get; set; }
         protected Point _pitPos { get; set; }
 
-        private float _UseOftires = 0.5f;
-
         public float FuelMass { get; private set; }
-        protected float FuelBurningRatio = 0.00001f;
+        protected float FuelBurningRatio { get; } = 0.00001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
-        protected float BrakesForce = 50000;
 
-        protected List<Car> _neighbouringCars;
+        protected List<Car> _neighbouringCars { get; set; }
 
         protected bool _recalculateHeadingAngle { get; set; } = true;
-        protected bool _recalculatePit { get; set; } = true;
 
-        private double currentTurnAngle = -Math.PI / 2;
+        private double currentTurnAngle { get; set; } = -Math.PI / 2;
 
-        private Worldinformation _worldInf;
-        private int _carSafeDistance;
+        private Worldinformation _worldInf { get; set; }
+        private int _carSafeDistance { get; set; }
 
         public enum STATE
         {
@@ -265,43 +258,6 @@ namespace NASCAR_Races
                     //Debug.WriteLine(temp);
                     Y = (float)(bottomBorderPit - temp);
                 }
-
-
-
-
-
-
-
-
-                // do góry przed pitem
-                /*int manover_size = (int)Length * 2;
-                if (X > _pitPos.X - manover_size && X < _pitPos.X && (int)Y > (int)_pitPos.Y)
-                {
-                    _currentAtanPit = (float)(Math.Atan((-_pitPos.X + (X + manover_size / 2)) / 20.0) + Math.PI / 2) * 6;
-                    Y = Y - (_currentAtanPit - _previosAtanPit);
-                    _previosAtanPit = _currentAtanPit;
-                }
-                // w dol po picie
-                else if (X > _pitPos.X && (int)Y < bottomBorderPit)
-                {
-                    _currentAtanPit = (float)(Math.Atan((X - (_pitPos.X + manover_size / 2)) / 10.0) + Math.PI / 2) * 6;
-                    Y = Y + (_currentAtanPit - _previosAtanPit);
-                    _previosAtanPit = _currentAtanPit;
-                }
-                else { _previosAtanPit = 0; }
-                if (_pitPos.Y > Y)
-                {
-                    Debug.WriteLine("Error: ");
-                }
-                if (X >= _pitPos.X - 1 && X <= _pitPos.X + 1 && FuelMass + 5 < _worldInf.CarInitialFuelMass)
-                {
-                    State = STATE.PIT_STOPPED;
-                    Thread.Sleep(1000);
-                    FuelMass = _worldInf.CarInitialFuelMass;
-                    _previosAtanPit = 0;
-                    _lastExecutionTime = DateTime.Now;
-                }*/
-
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
@@ -312,10 +268,6 @@ namespace NASCAR_Races
             {
                 notBraking();
             }*/
-        }
-        public float DistanceFromPointToPoint(float x1, float y1, float x2, float y2)
-        {
-            return (float)Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
         //sila odsrodkowa
         public float CentrifugalForce(float radius)
@@ -588,6 +540,5 @@ namespace NASCAR_Races
             if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize / 4) return Worldinformation.CIRCUIT_PARTS.PIT;
             return Worldinformation.CIRCUIT_PARTS.BOTTOM;
         }
-
     }
 }
