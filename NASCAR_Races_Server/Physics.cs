@@ -46,7 +46,7 @@ namespace NASCAR_Races
         private float _UseOftires = 0.5f;
 
         public float FuelMass { get; private set; }
-        protected float FuelBurningRatio = 0.001f;
+        protected float FuelBurningRatio = 0.00001f;
 
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
@@ -92,7 +92,6 @@ namespace NASCAR_Races
         // Run in the loop
         public void RunPhysic()
         {
-            State = STATE.PIT;
             DateTime currentTime = DateTime.Now;
             TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
             _lastExecutionTime = currentTime;
@@ -215,12 +214,12 @@ namespace NASCAR_Races
                 int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4 - (int)Length / 2;
                 if (Y < bottomBorderPit && _pitPos.X - 100 > X)
                 {
-                    Y++;
+                    Y += 0.25f;
                 }
                 if (Speed > _worldInf.CarMaxSpeedInPit)
                 {
                     CurrentHorsePower = 0;
-                    Speed -= 1f;
+                    Speed -= 0.5f;
                 }
                 else
                 {
@@ -231,8 +230,8 @@ namespace NASCAR_Races
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
 
-                double distanceToPit = _pitPos.X - X;
-                if (distanceToPit < _worldInf.CarLengthOfPittingManouver - 2 && distanceToPit > 0)
+                double distanceToPit = Math.Abs(_pitPos.X - X);
+                if (distanceToPit < _worldInf.CarLengthOfPittingManouver - 2 && X < _pitPos.X)
                 {
                     //AcrTan in <-2;2> interval; Value: <Atan(-2);Atan(2)>
                     double temp = Math.Atan(((double)_worldInf.CarLengthOfPittingManouver / 2 - distanceToPit) / (double)_worldInf.CarLengthOfPittingManouver * 4);
@@ -253,19 +252,16 @@ namespace NASCAR_Races
                     X += 4;
                     _lastExecutionTime = DateTime.Now;
                 }
-                else if (distanceToPit < 0 && distanceToPit + _worldInf.CarLengthOfPittingManouver / 2 > 0)
+                else if (X > _pitPos.X && distanceToPit + _worldInf.CarLengthOfPittingManouver > 0)
                 {
                     //AcrTan in <-2;2> interval; Value: <Atan(-2);Atan(2)>
                     double temp = Math.Atan(((double)_worldInf.CarLengthOfPittingManouver / 2 - distanceToPit) / (double)_worldInf.CarLengthOfPittingManouver * 4);
-                    //Reverting ArcTan
-                    temp *= -1;
-                    Debug.WriteLine(temp);
-                    //Value: <0;Atan(-2)>
-                    temp -= Math.Atan(2);
+                    //Value: <0;Atan(2)>
+                    temp -= Math.Atan(-2);
                     //Value: <0;1>
-                    temp /= Math.Atan(-2);
+                    temp /= Math.Atan(2);
                     //Value: <0;_worldInf.CarWidthOfPittingManouver)
-                    temp *= _worldInf.CarWidthOfPittingManouver / 2;
+                    temp *= _worldInf.CarWidthOfPittingManouver;
                     //Debug.WriteLine(temp);
                     Y = (float)(bottomBorderPit - temp);
                 }

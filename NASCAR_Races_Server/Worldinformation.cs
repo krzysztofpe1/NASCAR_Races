@@ -22,7 +22,7 @@ namespace NASCAR_Races
         public int PenCircuitSize { get; }
         public int PenCarSize { get; }
 
-        public int NumberOfCars { get; } = 1;
+        public int NumberOfCars { get; } = 10;
 
         public int CarViewingRadius { get; }
         public int CarsSafeDistance { get; } = 10;
@@ -60,7 +60,7 @@ namespace NASCAR_Races
             CarViewingRadius = carViewingRadius;
 
             CarPitStopEntryOffset = PenCircuitSize / 3;
-            CarLengthOfPittingManouver = CarLength * 10;
+            CarLengthOfPittingManouver = CarLength * 3;
         }
 
         //returns List<Car> that are in CarViewingRadius of callerCar
