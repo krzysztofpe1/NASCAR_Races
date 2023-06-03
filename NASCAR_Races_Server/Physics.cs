@@ -3,6 +3,7 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.VisualBasic.Logging;
+using NASCAR_Races_Server;
 
 namespace NASCAR_Races
 {
@@ -182,6 +183,7 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM)
             {
+
                 //BOTTOM
                 (float, float, float) temp = DistanceToSpeedAndHPOfOpponentInFront();
                 if (temp.Item1 < float.MaxValue && temp.Item3 < MaxHorsePower)
@@ -204,6 +206,10 @@ namespace NASCAR_Races
             }
             else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
             {
+                float Xtemp = X;
+                float Ytemp = Y;
+                HeadingAngle = 180;
+                //timeElapsed = 0.01f;
                 int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4 - (int)Length / 2;
                 if (Y < bottomBorderPit && _pitPos.X - 100 > X)
                 {
@@ -221,8 +227,7 @@ namespace NASCAR_Races
                 }
 
                 X += Speed * timeElapsed;
-                HeadingAngle = 180;
-
+                
                 double distanceToPit = Math.Abs(_pitPos.X - X);
                 if (distanceToPit < _worldInf.CarLengthOfPittingManouver - 2 && X < _pitPos.X)
                 {
@@ -258,6 +263,7 @@ namespace NASCAR_Races
                     //Debug.WriteLine(temp);
                     Y = (float)(bottomBorderPit - temp);
                 }
+                HeadingAngle = 180 + (float)Math.Atan((Ytemp - Y) / (Xtemp - X))* 20;
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
@@ -539,6 +545,62 @@ namespace NASCAR_Races
             if (Y < _worldInf.CanvasCenterY) return Worldinformation.CIRCUIT_PARTS.TOP;
             if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize / 4) return Worldinformation.CIRCUIT_PARTS.PIT;
             return Worldinformation.CIRCUIT_PARTS.BOTTOM;
+        }
+        public CarMapper MapPhysics(CarMapper car)
+        {
+            car.X = this.X; 
+            car.Y = this.Y;
+            car.Length = this.Length;
+            car.Width = this.Width;
+            car.Speed = this.Speed;
+            car.HeadingAngle = this.HeadingAngle;
+            car._currentAcceleration = this._currentAcceleration;
+            car._mass = this._mass;
+            car._frictionofweels = this._frictionofweels;
+            car._lastExecutionTime = this._lastExecutionTime;
+            car._leftCircle = this._leftCircle;
+            car._rightCircle = this._rightCircle;
+            car._circleRadius = this._circleRadius;
+            car._pitPos = this._pitPos;
+            car.FuelMass = this.FuelMass;
+            //car.FuelBurningRatio = this.FuelBurningRatio;
+            car.MaxHorsePower = this.MaxHorsePower;
+            car.CurrentHorsePower = this.CurrentHorsePower;
+            car._neighbouringCars = this._neighbouringCars; // najpewnie do wyjebania krzychu bo duzo pamięci 
+            car._recalculateHeadingAngle = this._recalculateHeadingAngle;
+            car.currentTurnAngle = this.currentTurnAngle;
+            car._worldInf = this._worldInf;// zakomentuj
+            car._carSafeDistance = this._carSafeDistance;
+            car.State = (CarMapper.STATE)this.State;
+            return car;
+        }
+        public void unMapPhysics(CarMapper car)
+        {
+
+            this.X = car.X;
+            this.Y = car.Y;
+            this.Length = car.Length;
+            this.Width = car.Width;
+            this.Speed = car.Speed;
+            this.HeadingAngle = car.HeadingAngle;
+            this._currentAcceleration = car._currentAcceleration;
+            this._mass = car._mass;
+            this._frictionofweels = car._frictionofweels;
+            this._lastExecutionTime = car._lastExecutionTime;
+            this._leftCircle = car._leftCircle;
+            this._rightCircle = car._rightCircle;
+            this._circleRadius = car._circleRadius;
+            this._pitPos = car._pitPos;
+            this.FuelMass = car.FuelMass;
+            //this.FuelBurningRatio = car.FuelBurningRatio;
+            this.MaxHorsePower = car.MaxHorsePower;
+            this.CurrentHorsePower = car.CurrentHorsePower;
+            this._neighbouringCars = car._neighbouringCars; // najpewnie do wyjebania krzychu bo duzo pamięci 
+            this._recalculateHeadingAngle = car._recalculateHeadingAngle;
+            this.currentTurnAngle = car.currentTurnAngle;
+            this._worldInf = car._worldInf; // zakomentuj
+            this._carSafeDistance = car._carSafeDistance;
+            this.State = (STATE)car.State;
         }
     }
 }

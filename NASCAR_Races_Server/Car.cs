@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-
+using NASCAR_Races_Server;
+using System.Security.Cryptography.X509Certificates;
 
 namespace NASCAR_Races
 {
@@ -67,5 +68,19 @@ namespace NASCAR_Races
                 Thread.Sleep(10);
             }
         }
+        
+        public CarMapper CreateMapper()
+        {
+            //carMapper.
+            var carMapper = new CarMapper
+            {
+                //CAR variables
+                IsDisposable = this.IsDisposable,
+                Started = this.Started,
+                CarName = this.CarName,
+            };
+            return this.MapPhysics(carMapper);
+        }
+        
     }
 }
