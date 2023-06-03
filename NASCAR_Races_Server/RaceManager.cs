@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Diagnostics;
 namespace NASCAR_Races
 {
     public class RaceManager
@@ -68,6 +68,8 @@ namespace NASCAR_Races
             for (int i = 0; i < Worldinformation.NumberOfCars; i++)
             {
                 CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
+                //CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 25000 + (float)random.NextDouble() * 5000, Worldinformation);
+                //Debug.WriteLine();
                 ListOfCarThreads.Add(car);
                 ListOfCars.Add((Car)car);
             }
@@ -81,32 +83,61 @@ namespace NASCAR_Races
             {
                 foreach (Car car1 in ListOfCars)
                 {
-                    if (car1.State != Car.STATE.ON_CIRCUIT && car1.State != Car.STATE.ON_WAY_TO_PIT_STOP) continue;
+                    if (car1.State != Car.STATE.ON_CIRCUIT && car1.State != Car.STATE.ON_WAY_TO_PIT_STOP)
+                        continue;
+
                     foreach (Car car2 in ListOfCars)
                     {
-                        if (car1 == car2) continue;
-                        if (car1.IsDisposable || car2.IsDisposable) continue;
-                        if (Math.Abs(car1.X - car2.X) < car1.Length / 2 + car2.Length / 2 && Math.Abs(car1.Y - car2.Y) < car1.Width / 2 + car2.Width / 2)
+                        if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
+                            continue;
+
+                        if (AreRectanglesColliding(car1, car2))
                         {
-                            double diagonal = Math.Sqrt(Math.Pow(car1.Length, 2) + Math.Pow(car1.Width, 2));
-                            double diagonal2 = Math.Sqrt(Math.Pow(car2.Length, 2) + Math.Pow(car2.Width, 2));
-                            double angle1 = (car1.HeadingAngle + 90) % 360;
-                            double angle2 = (car2.HeadingAngle + 90) % 360;
-                            double diffAngle = Math.Abs(angle1 - angle2);
-                            if (diffAngle > 180) diffAngle = 360 - diffAngle;
-                            double distance = Math.Sqrt(Math.Pow(car2.X - car1.X, 2) + Math.Pow(car2.Y - car1.Y, 2));
-                            double diagonalSum = diagonal + diagonal2;
-                            if (distance <= diagonalSum && Math.Abs(diffAngle) < 90)
-                            {
-                                car1.IsDisposable = true;
-                                car2.IsDisposable = true;
-                                Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
-                            }
+                            car1.IsDisposable = true;
+                            car2.IsDisposable = true;
+                            Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
                         }
                     }
                 }
             }
         }
+
+        private bool AreRectanglesColliding(Car car1, Car car2)
+        {
+            double car1MinX = car1.X - car1.Length / 2;
+            double car1MaxX = car1.X + car1.Length / 2;
+            double car1MinY = car1.Y - car1.Width / 2;
+            double car1MaxY = car1.Y + car1.Width / 2;
+
+            double car2MinX = car2.X - car2.Length / 2;
+            double car2MaxX = car2.X + car2.Length / 2;
+            double car2MinY = car2.Y - car2.Width / 2;
+            double car2MaxY = car2.Y + car2.Width / 2;
+
+            // Rotate the coordinates of the second car by the angle of the first car
+            double rotationAngle = car1.HeadingAngle;
+            double cosAngle = Math.Cos(rotationAngle);
+            double sinAngle = Math.Sin(rotationAngle);
+
+            double car2RotatedMinX = (car2MinX - car1.X) * cosAngle - (car2MinY - car1.Y) * sinAngle + car1.X;
+            double car2RotatedMaxX = (car2MaxX - car1.X) * cosAngle - (car2MaxY - car1.Y) * sinAngle + car1.X;
+            double car2RotatedMinY = (car2MinX - car1.X) * sinAngle + (car2MinY - car1.Y) * cosAngle + car1.Y;
+            double car2RotatedMaxY = (car2MaxX - car1.X) * sinAngle + (car2MaxY - car1.Y) * cosAngle + car1.Y;
+
+            if (car1MaxX < car2RotatedMinX || car1MinX > car2RotatedMaxX)
+                return false;
+
+            if (car1MaxY < car2RotatedMinY || car1MinY > car2RotatedMaxY)
+                return false;
+
+            return true;
+        }
+
+
+
+
+
+
 
         private Point NextStartingPoint()
         {
