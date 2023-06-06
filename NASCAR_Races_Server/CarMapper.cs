@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace NASCAR_Races_Server
 {
+    [Serializable]
     public class CarMapper
     {
         public enum STATE
@@ -47,8 +48,6 @@ namespace NASCAR_Races_Server
 
         public float CurrentHorsePower;
 
-        public List<Car> _neighbouringCars;
-
         public bool _recalculateHeadingAngle;
 
         public double currentTurnAngle;
@@ -58,11 +57,5 @@ namespace NASCAR_Races_Server
         public STATE State;
 
         public CarMapper() { }
-        public Car CrateNewCar()// Tak jak mówiłeś tymczasowo tak jest
-        {
-            var car = new Car(this.X, this.Y, this._mass,this.CarName, this.MaxHorsePower, this._worldInf);
-            car.unMapPhysics(this);
-            return car;
-        }
     }
 }

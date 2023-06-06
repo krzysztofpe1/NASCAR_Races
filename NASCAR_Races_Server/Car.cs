@@ -69,7 +69,7 @@ namespace NASCAR_Races_Server
             }
         }
         
-        public CarMapper CreateMapper()
+        public CarMapper CreateMap()
         {
             //carMapper.
             var carMapper = new CarMapper
@@ -82,5 +82,12 @@ namespace NASCAR_Races_Server
             return this.MapPhysics(carMapper);
         }
         
+        public void CopyMapper(CarMapper map)
+        {
+            IsDisposable = map.IsDisposable;
+            Started = map.Started;
+            CarName = map.CarName;
+            base.CopyMapper(map);
+        }
     }
 }

@@ -566,7 +566,6 @@ namespace NASCAR_Races_Server
             //car.FuelBurningRatio = this.FuelBurningRatio;
             car.MaxHorsePower = this.MaxHorsePower;
             car.CurrentHorsePower = this.CurrentHorsePower;
-            car._neighbouringCars = this._neighbouringCars; // najpewnie do wyjebania krzychu bo duzo pamięci 
             car._recalculateHeadingAngle = this._recalculateHeadingAngle;
             car.currentTurnAngle = this.currentTurnAngle;
             car._worldInf = this._worldInf;// zakomentuj
@@ -574,7 +573,7 @@ namespace NASCAR_Races_Server
             car.State = (CarMapper.STATE)this.State;
             return car;
         }
-        public void unMapPhysics(CarMapper car)
+        public void CopyMapper(CarMapper car)
         {
 
             this.X = car.X;
@@ -595,7 +594,6 @@ namespace NASCAR_Races_Server
             //this.FuelBurningRatio = car.FuelBurningRatio;
             this.MaxHorsePower = car.MaxHorsePower;
             this.CurrentHorsePower = car.CurrentHorsePower;
-            this._neighbouringCars = car._neighbouringCars; // najpewnie do wyjebania krzychu bo duzo pamięci 
             this._recalculateHeadingAngle = car._recalculateHeadingAngle;
             this.currentTurnAngle = car.currentTurnAngle;
             this._worldInf = car._worldInf; // zakomentuj
