@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Microsoft.VisualBasic.Logging;
 using NASCAR_Races_Server;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
     public class Physics
     {
@@ -53,7 +53,7 @@ namespace NASCAR_Races
 
         private double currentTurnAngle { get; set; } = -Math.PI / 2;
 
-        private Worldinformation _worldInf { get; set; }
+        private WorldInformation _worldInf { get; set; }
         private int _carSafeDistance { get; set; }
 
         public enum STATE
@@ -67,7 +67,7 @@ namespace NASCAR_Races
 
         public STATE State { get; protected set; } = STATE.ON_CIRCUIT;
 
-        public Physics(float x, float y, float mass, float frictionofweels, float maxHorsePower, Worldinformation worldInfo)
+        public Physics(float x, float y, float mass, float frictionofweels, float maxHorsePower, WorldInformation worldInfo)
         {
             X = x;
             Y = y;
@@ -99,11 +99,11 @@ namespace NASCAR_Races
             //if (Acceleration() < AirR + wheelFriction) _currentAcceleration = 0;
             //FuelMass -= CurrentHorsePower * FuelBurningRatio; // * time
             var partOfCircuit = WhatPartOfCircuitIsCarOn();
-            if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.RIGHT_TURN)
+            if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.RIGHT_TURN)
             {
                 MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, true, _rightCircle);
             }
-            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.LEFT_TURN)
+            else if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.LEFT_TURN)
             {
                 MoveCarOnCircle((float)timeSinceLastExecution.TotalSeconds, false, _leftCircle);
             }
@@ -135,10 +135,10 @@ namespace NASCAR_Races
             X = a + r * (float)Math.Cos(-currentTurnAngle);
             Y = b + r * (float)Math.Sin(-currentTurnAngle);
         }
-        private void MoveCarOnStraight(float timeElapsed, Worldinformation.CIRCUIT_PARTS partOfCircuit)
+        private void MoveCarOnStraight(float timeElapsed, WorldInformation.CIRCUIT_PARTS partOfCircuit)
         {
             CurrentHorsePower = MaxHorsePower;
-            if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.TOP)
+            if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.TOP)
             {
                 //TOP
                 if (State == STATE.ON_WAY_TO_PIT_STOP)
@@ -181,7 +181,7 @@ namespace NASCAR_Races
                 HeadingAngle = 0;
 
             }
-            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.BOTTOM)
+            else if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.BOTTOM)
             {
 
                 //BOTTOM
@@ -204,7 +204,7 @@ namespace NASCAR_Races
                 X += Speed * timeElapsed;
                 HeadingAngle = 180;
             }
-            else if (partOfCircuit == Worldinformation.CIRCUIT_PARTS.PIT)
+            else if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.PIT)
             {
                 float Xtemp = X;
                 float Ytemp = Y;
@@ -389,13 +389,13 @@ namespace NASCAR_Races
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
-                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.LEFT_TURN:
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.RIGHT_TURN:
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.TOP:
+                    case WorldInformation.CIRCUIT_PARTS.TOP:
                         //Car will enter "left" turn
                         if (car.Y < Y)
                         {
@@ -404,7 +404,7 @@ namespace NASCAR_Races
                             if (temp < distance) distance = temp;
                         }
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                    case WorldInformation.CIRCUIT_PARTS.BOTTOM:
                         //Car will enter "right" turn
                         if (car.Y > Y)
                         {
@@ -413,7 +413,7 @@ namespace NASCAR_Races
                             if (temp < distance) distance = temp;
                         }
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.PIT:
+                    case WorldInformation.CIRCUIT_PARTS.PIT:
 
                         break;
                 }
@@ -432,13 +432,13 @@ namespace NASCAR_Races
                 float temp;
                 switch (_worldInf.WhatPartOfCircuitIsCarOn(this))
                 {
-                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.LEFT_TURN:
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.RIGHT_TURN:
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.TOP:
+                    case WorldInformation.CIRCUIT_PARTS.TOP:
                         //Car will enter "left" turn
                         if (car.Y > Y)
                         {
@@ -447,7 +447,7 @@ namespace NASCAR_Races
                             if (temp < distance) distance = temp;
                         }
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                    case WorldInformation.CIRCUIT_PARTS.BOTTOM:
                         //Car will enter "right" turn
                         if (car.Y < Y)
                         {
@@ -456,7 +456,7 @@ namespace NASCAR_Races
                             if (temp < distance) distance = temp;
                         }
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.PIT:
+                    case WorldInformation.CIRCUIT_PARTS.PIT:
 
                         break;
                 }
@@ -472,14 +472,14 @@ namespace NASCAR_Races
                 int temp;
                 switch (WhatPartOfCircuitIsCarOn())
                 {
-                    case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.RIGHT_TURN:
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+                    case WorldInformation.CIRCUIT_PARTS.LEFT_TURN:
 
 
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.TOP:
+                    case WorldInformation.CIRCUIT_PARTS.TOP:
                         if (car.X > X) continue;
                         if (Math.Abs(car.Y - Y) > Width / 2 + car.Width / 2) continue;
                         temp = (int)((X - Length / 2) - (car.X + car.Length / 2));
@@ -489,7 +489,7 @@ namespace NASCAR_Races
                             tempCar = car;
                         }
                         break;
-                    case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                    case WorldInformation.CIRCUIT_PARTS.BOTTOM:
                         if (car.X < X) continue;
                         if (Math.Abs(car.Y - Y) > Width / 2 + car.Width / 2) continue;
                         temp = (int)((car.X - car.Length / 2) - (X + Length / 2));
@@ -538,13 +538,13 @@ namespace NASCAR_Races
                 }
             }
         }
-        public Worldinformation.CIRCUIT_PARTS WhatPartOfCircuitIsCarOn()
+        public WorldInformation.CIRCUIT_PARTS WhatPartOfCircuitIsCarOn()
         {
-            if (X < _leftCircle.X) return Worldinformation.CIRCUIT_PARTS.LEFT_TURN;
-            if (X > _rightCircle.X) return Worldinformation.CIRCUIT_PARTS.RIGHT_TURN;
-            if (Y < _worldInf.CanvasCenterY) return Worldinformation.CIRCUIT_PARTS.TOP;
-            if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize / 4) return Worldinformation.CIRCUIT_PARTS.PIT;
-            return Worldinformation.CIRCUIT_PARTS.BOTTOM;
+            if (X < _leftCircle.X) return WorldInformation.CIRCUIT_PARTS.LEFT_TURN;
+            if (X > _rightCircle.X) return WorldInformation.CIRCUIT_PARTS.RIGHT_TURN;
+            if (Y < _worldInf.CanvasCenterY) return WorldInformation.CIRCUIT_PARTS.TOP;
+            if (Math.Abs(Y - _worldInf.PitPosY) < _worldInf.PenCircuitSize / 4) return WorldInformation.CIRCUIT_PARTS.PIT;
+            return WorldInformation.CIRCUIT_PARTS.BOTTOM;
         }
         public CarMapper MapPhysics(CarMapper car)
         {

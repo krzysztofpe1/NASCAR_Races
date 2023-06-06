@@ -1,5 +1,4 @@
-﻿using NASCAR_Races;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -54,7 +53,7 @@ namespace NASCAR_Races_Server
 
         public double currentTurnAngle;
 
-        public Worldinformation _worldInf;
+        public WorldInformation _worldInf;
         public int _carSafeDistance;
         public STATE State;
 

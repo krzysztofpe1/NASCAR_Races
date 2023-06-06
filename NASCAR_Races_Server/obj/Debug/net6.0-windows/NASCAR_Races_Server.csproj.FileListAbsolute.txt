@@ -4,7 +4,6 @@ Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Debug\net6.0-windows\NASCAR_Races_Ser
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Debug\net6.0-windows\NASCAR_Races_Server.dll
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Debug\net6.0-windows\NASCAR_Races_Server.pdb
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.csproj.AssemblyReference.cache
-Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races.MainWindow.resources
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.csproj.GenerateResource.cache
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.GeneratedMSBuildEditorConfig.editorconfig
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.AssemblyInfoInputs.cache
@@ -15,3 +14,4 @@ Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\refint\NASCAR_Ra
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.pdb
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.genruntimeconfig.cache
 Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\ref\NASCAR_Races_Server.dll
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\obj\Debug\net6.0-windows\NASCAR_Races_Server.MainServerWindow.resources

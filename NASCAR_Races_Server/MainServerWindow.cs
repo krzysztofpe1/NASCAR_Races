@@ -2,13 +2,14 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
-    public partial class MainWindow : Form
+    internal partial class MainServerWindow : Form
     {
         private Painter _painter;
         private RaceManager _raceManager;
-        public MainWindow()
+        private bool _raceStarted = false;
+        public MainServerWindow()
         {
             InitializeComponent();
             int maxX = mainPictureBox.Width;
@@ -19,17 +20,13 @@ namespace NASCAR_Races
             int turnCurveRadius = 0;
             int totalLength = (int)(maxX + 2 * 3.1415 * _turnRadius);
             int penCircuitSize = 60;
-            int penCarSize=1;
+            int penCarSize = 1;
             _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, mainPictureBox);
             _painter = new(_raceManager.Worldinformation);
-            
-            _painter.listOfCars = _raceManager.CreateListOfCars();
 
             programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)
             programTimer.Tick += new EventHandler(RunRace);
             programTimer.Start();
-            Thread tempThread = new(_raceManager.StartRace);
-            tempThread.Start();
             this.FormClosing += MainWindowClosing_KillThreads;
         }
 
@@ -51,5 +48,19 @@ namespace NASCAR_Races
             _raceManager.KillThreads();
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (!_raceStarted)
+            {
+                //if race hadn't started yet
+                Thread tempThread = new(_raceManager.StartRace);
+                tempThread.Start();
+            }
+            else
+            {
+                _raceManager.KillThreads();
+            }
+            _raceStarted = !_raceStarted;
+        }
     }
 }

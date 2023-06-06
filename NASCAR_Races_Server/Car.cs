@@ -7,7 +7,7 @@ using System.Diagnostics;
 using NASCAR_Races_Server;
 using System.Security.Cryptography.X509Certificates;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
     public class Car : Physics
     {
@@ -16,8 +16,8 @@ namespace NASCAR_Races
 
         public string CarName { get; private set; }
 
-        private Worldinformation _worldInfo;
-        public Car(float x, float y, float weight, string carName, float maxHorsePower, Worldinformation worldInfo) : base(x, y, weight, 0.3f, maxHorsePower, worldInfo)
+        private WorldInformation _worldInfo;
+        public Car(float x, float y, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(x, y, weight, 0.3f, maxHorsePower, worldInfo)
         {
             CarName = carName;
             _worldInfo = worldInfo;
@@ -42,23 +42,23 @@ namespace NASCAR_Races
                     int distanceToOpponentOnLeft = (int)DistanceToOpponentOnLeft();
                     switch (partOfCircuit)
                     {
-                        case Worldinformation.CIRCUIT_PARTS.LEFT_TURN:
+                        case WorldInformation.CIRCUIT_PARTS.LEFT_TURN:
 
                             break;
-                        case Worldinformation.CIRCUIT_PARTS.RIGHT_TURN:
+                        case WorldInformation.CIRCUIT_PARTS.RIGHT_TURN:
 
                             break;
-                        case Worldinformation.CIRCUIT_PARTS.TOP:
+                        case WorldInformation.CIRCUIT_PARTS.TOP:
                             //Car will enter "left" turn
                             if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, false);
                             else FindCircle((int)Y, false);
                             break;
-                        case Worldinformation.CIRCUIT_PARTS.BOTTOM:
+                        case WorldInformation.CIRCUIT_PARTS.BOTTOM:
                             //Car will enter "right" turn
                             if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, true);
                             else FindCircle((int)Y, true);
                             break;
-                        case Worldinformation.CIRCUIT_PARTS.PIT:
+                        case WorldInformation.CIRCUIT_PARTS.PIT:
                             State = STATE.PIT;
                             FindSafeCircle((int)Y, true);
                             break;

@@ -8,4 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NASCAR_Races_Server\NASCAR_Races_Server.csproj" />
+  </ItemGroup>
+
 </Project>

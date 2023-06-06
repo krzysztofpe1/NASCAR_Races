@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
     public class Painter
     {
@@ -19,11 +19,11 @@ namespace NASCAR_Races
         private Pen _penCar;
         private int _halfPaintBrushSize = 30;
         //Points of start and end of the straights
-        public List<Car> listOfCars { set; get; }
+        public List<Car> listOfCars { get; set; }
         private int _x1, _x2;
 
-        private Worldinformation _worldinformation;
-        public Painter(Worldinformation worldinformation)
+        private WorldInformation _worldinformation;
+        public Painter(WorldInformation worldinformation)
         {
             _canvasHeight = worldinformation.CanvasHeight;
             _canvasWidth = worldinformation.CanvasWidth;
@@ -35,6 +35,7 @@ namespace NASCAR_Races
             _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;
             _x2 = _canvasWidth / 2 + _straightLength / 2;
+            listOfCars = new List<Car>();
         }
         public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
         {
@@ -74,7 +75,7 @@ namespace NASCAR_Races
 
         public void PaintCarsPosition(Graphics g)
         {
-            if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
+            if (listOfCars.Count() == 0) return;
             listOfCars.ForEach(car => { PaintCar(g, car); });
             //Console.Clear();
             //listOfCars.ForEach(car => { WriteLogs(car); });

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
-    public class Worldinformation
+    public class WorldInformation
     {
         public int CanvasWidth { get; }
         public int CanvasHeight { get; }
@@ -40,7 +40,7 @@ namespace NASCAR_Races
 
         public List<Car> ListOfCars { get; set; }
 
-        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
+        public WorldInformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
