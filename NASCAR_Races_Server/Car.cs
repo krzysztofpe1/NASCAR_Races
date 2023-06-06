@@ -22,6 +22,12 @@ namespace NASCAR_Races_Server
             CarName = carName;
             _worldInfo = worldInfo;
         }
+        public Car(Point startingPos, Point pitPos, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(startingPos.X, startingPos.Y, weight, 0.3f, maxHorsePower, worldInfo)
+        {
+            CarName=carName;
+            _worldInfo = worldInfo;
+            _pitPos = pitPos;
+        }
         Random random = new Random();
         public void Move()
         {
@@ -32,6 +38,7 @@ namespace NASCAR_Races_Server
             while (!IsDisposable)
             {
                 if (!Started) continue;
+                Debug.WriteLine("gowno");
                 //refreshing neighbouring cars list every 10 iterations
                 if (++counter >= 5)
                 //if (true)

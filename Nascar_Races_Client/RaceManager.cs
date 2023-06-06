@@ -1,6 +1,7 @@
 ﻿using NASCAR_Races_Server;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace Nascar_Races_Client
     internal class RaceManager
     {
         public Car MyCar { get; private set; }
-        public List<CarClientHandler> ListOfCarThreads;
+        private ClientTCPHandler _client;
         public List<Car> ListOfCars;
 
         private int _canvasWidth;
@@ -55,11 +56,33 @@ namespace Nascar_Races_Client
             _nextPitPos.Y = pitPosY - penCircuitSize / 4 + WorldInformation.CarWidth / 2;
             WorldInformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
             _nextPitPos.X = WorldInformation.x2 - WorldInformation.CarLength;
+            _client = new ClientTCPHandler(WorldInformation, NextStartingPoint(), NextPitPoint());
+        }
+        public List<Car> getCars()
+        {
+            var temp = new List<Car>();
+            temp.Add(_client.MyCar);
+            return temp;
+        }
+
+        private Point NextStartingPoint()
+        {
+            Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
+            _nextStartingPos.X -= _straightLength / 30;
+            _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
+            return tempPoint;
+        }
+        private Point NextPitPoint()
+        {
+            Point temp = new(_nextPitPos.X, _nextPitPos.Y);
+            _nextPitPos.X -= WorldInformation.CarLength * 4;
+            return temp;
         }
 
         public void StartRace()
         {
-
+            //TODO przenies to gdzies
+            _client.StartCar();
         }
         public void PrepareRace()
         {

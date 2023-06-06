@@ -18,22 +18,32 @@ namespace Nascar_Races_Client
         private TcpClient _commClient;
         private NetworkStream _dataStream;
         private NetworkStream _commStream;
-        private Thread _thread;
+        private Thread _dataThread;
         public bool IsDisposable { get; private set; } = false;
         private BinaryFormatter _binaryFormatter;
         public Car MyCar { get; private set; }
-        public ClientTCPHandler()
+        public Thread CarThread { get; private set; }
+        public ClientTCPHandler(WorldInformation worldInf, Point startingPos, Point pitPos)
         {
             _binaryFormatter = new BinaryFormatter();
+            MyCar = new(startingPos, pitPos, 1000, "1", 30000, worldInf);
+            CarThread = new(MyCar.Move);
+            CarThread.Start();
             if (Connect())
             {
-                _thread = new(ExchangeData);
-                _thread.Start();
+                CarThread = new(MyCar.Move);
+                CarThread.Start();
+                _dataThread = new(ExchangeData);
+                _dataThread.Start();
             }
             else
             {
 
             }
+        }
+        public void StartCar()
+        {
+            MyCar.Started = true;
         }
 
         private bool Connect()

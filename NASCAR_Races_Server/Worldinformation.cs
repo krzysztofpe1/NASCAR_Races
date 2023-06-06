@@ -66,6 +66,7 @@ namespace NASCAR_Races_Server
         //returns List<Car> that are in CarViewingRadius of callerCar
         public List<Car> NearbyCars(Car callerCar)
         {
+            return new List<Car>(); //TODO zmienic to
             List<Car> res = new List<Car>();
             ListOfCars.ForEach(car =>
             {
