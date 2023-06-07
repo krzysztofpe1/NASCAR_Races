@@ -1,6 +1,7 @@
 ﻿using NASCAR_Races_Server;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,6 +12,7 @@ namespace Nascar_Races_Client
 {
     internal class ClientTCPHandler
     {
+        private static int startRaceSignal { get; } = 1;
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
         private static string _serverIP { get; } = "127.0.0.1";
@@ -19,6 +21,7 @@ namespace Nascar_Races_Client
         private NetworkStream _dataStream;
         private NetworkStream _commStream;
         private Thread _dataThread;
+        private Thread _commThread;
         public bool IsDisposable { get; private set; } = false;
         private BinaryFormatter _binaryFormatter;
         public Car MyCar { get; private set; }
@@ -28,13 +31,13 @@ namespace Nascar_Races_Client
             _binaryFormatter = new BinaryFormatter();
             MyCar = new(startingPos, pitPos, 1000, "1", 30000, worldInf);
             CarThread = new(MyCar.Move);
-            CarThread.Start();
             if (Connect())
             {
                 CarThread = new(MyCar.Move);
-                CarThread.Start();
                 _dataThread = new(ExchangeData);
                 _dataThread.Start();
+                _commThread = new(ExchangeComm);
+                _commThread.Start();
             }
             else
             {
@@ -72,21 +75,40 @@ namespace Nascar_Races_Client
 
             }
         }
+        private void ExchangeComm()
+        {
+            while (!IsDisposable)
+            {
+                byte[] comm = new byte[54];
+                _commStream.Read(comm);
+                using (var ms = new MemoryStream(comm))
+                {
+                    var formatter = new BinaryFormatter();
+                    int deserialized = (int)formatter.Deserialize(ms);
+                    if(deserialized == startRaceSignal)
+                    {
+                        CarThread.Start();
+                    }
+                }
+            }
+        }
         private byte[] SerializeCar()
         {
             using (MemoryStream stream = new())
             {
+                var formatter = new BinaryFormatter();
                 CarMapper map = MyCar.CreateMap();
                 _binaryFormatter.Serialize(stream, map);
                 return stream.ToArray();
             }
         }
 
-        private void Dispose()
+        public void Dispose()
         {
             _dataClient.Dispose();
             _commClient.Dispose();
             IsDisposable = true;
+            MyCar.IsDisposable = true;
         }
     }
 }

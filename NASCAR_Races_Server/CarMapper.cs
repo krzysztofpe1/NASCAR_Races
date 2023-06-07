@@ -52,7 +52,6 @@ namespace NASCAR_Races_Server
 
         public double currentTurnAngle;
 
-        public WorldInformation _worldInf;
         public int _carSafeDistance;
         public STATE State;
 

@@ -13,7 +13,7 @@ namespace NASCAR_Races_Server
 {
     internal class RaceManager
     {
-        public List<CarClientHandler> ListOfCarHandlers;
+        public List<CarClientHandler> ListOfCarHandlers { get; private set; }
 
         private int _canvasWidth;
         private int _canvasHeight;
@@ -59,6 +59,7 @@ namespace NASCAR_Races_Server
 
             _collisionCheckerThread = new(CheckCollisions);
             _tcpListenerThread = new(AwaitForCars);
+            _tcpListenerThread.Start();
 
             Worldinformation = new WorldInformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
 
@@ -66,6 +67,12 @@ namespace NASCAR_Races_Server
             _nextPitPos.Y = pitPosY - penCircuitSize / 4 + Worldinformation.CarWidth / 2;
             Worldinformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
             _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
+        }
+        public List<Car> getCars()
+        {
+            var temp = new List<Car>();
+            ListOfCarHandlers.ForEach(handler => { temp.Add(handler.GetCar()); });
+            return temp;
         }
 
         private void CheckCollisions()
@@ -103,12 +110,14 @@ namespace NASCAR_Races_Server
         {
             TcpListener dataServer = new(IPAddress.Parse(_serverIP), _dataPort);
             TcpListener commServer = new(IPAddress.Parse(_serverIP), _commPort);
+            dataServer.Start();
+            commServer.Start();
 
             while (true)
             {
                 TcpClient dataClient = dataServer.AcceptTcpClient();
                 TcpClient commClient = commServer.AcceptTcpClient();
-
+                Debug.WriteLine("Connected");
                 ListOfCarHandlers.Add(new(dataClient, commClient, NextStartingPoint(), NextPitPoint()));
             }
         }

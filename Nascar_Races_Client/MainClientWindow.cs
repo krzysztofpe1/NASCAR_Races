@@ -23,7 +23,7 @@ namespace Nascar_Races_Client
             _raceManager = new(straightLength, _turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, mainPictureBox);
             _raceManager.StartRace(); //TODO temporary
             _painter = new(_raceManager.WorldInformation);
-            _painter.listOfCars=_raceManager.getCars();
+            _painter.listOfCars = _raceManager.getCars();
 
             programTimer.Interval = 1;//Interval of Timer executing event "Tick" (in milliseconds)
             programTimer.Tick += new EventHandler(RunRace);
@@ -44,6 +44,7 @@ namespace Nascar_Races_Client
         private void MainWindowClosing_KillThreads(object sender, FormClosingEventArgs e)
         {
             _raceManager.EndRace();
+            _raceManager.Dispose();
         }
     }
 }

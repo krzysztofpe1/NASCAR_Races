@@ -17,6 +17,7 @@ namespace NASCAR_Races_Server
         public string CarName { get; private set; }
 
         private WorldInformation _worldInfo;
+        public Car() { }
         public Car(float x, float y, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(x, y, weight, 0.3f, maxHorsePower, worldInfo)
         {
             CarName = carName;
@@ -38,7 +39,6 @@ namespace NASCAR_Races_Server
             while (!IsDisposable)
             {
                 if (!Started) continue;
-                Debug.WriteLine("gowno");
                 //refreshing neighbouring cars list every 10 iterations
                 if (++counter >= 5)
                 //if (true)

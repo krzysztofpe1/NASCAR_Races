@@ -67,6 +67,8 @@ namespace NASCAR_Races_Server
 
         public STATE State { get; protected set; } = STATE.ON_CIRCUIT;
 
+        public Physics() { }
+
         public Physics(float x, float y, float mass, float frictionofweels, float maxHorsePower, WorldInformation worldInfo)
         {
             X = x;
@@ -568,7 +570,6 @@ namespace NASCAR_Races_Server
             car.CurrentHorsePower = this.CurrentHorsePower;
             car._recalculateHeadingAngle = this._recalculateHeadingAngle;
             car.currentTurnAngle = this.currentTurnAngle;
-            car._worldInf = this._worldInf;// zakomentuj
             car._carSafeDistance = this._carSafeDistance;
             car.State = (CarMapper.STATE)this.State;
             return car;
@@ -596,7 +597,6 @@ namespace NASCAR_Races_Server
             this.CurrentHorsePower = car.CurrentHorsePower;
             this._recalculateHeadingAngle = car._recalculateHeadingAngle;
             this.currentTurnAngle = car.currentTurnAngle;
-            this._worldInf = car._worldInf; // zakomentuj
             this._carSafeDistance = car._carSafeDistance;
             this.State = (STATE)car.State;
         }

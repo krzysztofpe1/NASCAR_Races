@@ -28,8 +28,6 @@ namespace Nascar_Races_Client
         private int _firstRow;
         private int _secondRow;
 
-        private Thread _thread;
-        private bool _killCollisionChecker = false;
 
         public WorldInformation WorldInformation { get; }
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, PictureBox mainPictureBox)
@@ -91,6 +89,10 @@ namespace Nascar_Races_Client
         public void EndRace()
         {
 
+        }
+        public void Dispose()
+        {
+            _client.Dispose();
         }
 
     }

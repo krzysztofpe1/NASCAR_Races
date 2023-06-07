@@ -1,11 +1,12 @@
-﻿using System;
+﻿using NASCAR_Races_Server;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races_Server
+namespace Nascar_Races_Client
 {
     internal class Painter
     {

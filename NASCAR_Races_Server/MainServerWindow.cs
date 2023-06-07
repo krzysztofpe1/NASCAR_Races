@@ -34,6 +34,7 @@ namespace NASCAR_Races_Server
         //Alternatywnie u¿yæ: mainPictureBox.Invalidate() w razie gdyby by³o potrzebne
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
+            _painter.listOfCars = _raceManager.getCars();
             _painter.PaintCircuit(e.Graphics);
             _painter.PaintCarsPosition(e.Graphics);
         }
@@ -53,8 +54,7 @@ namespace NASCAR_Races_Server
             if (!_raceStarted)
             {
                 //if race hadn't started yet
-                Thread tempThread = new(_raceManager.StartRace);
-                tempThread.Start();
+                _raceManager.StartRace();
             }
             else
             {
