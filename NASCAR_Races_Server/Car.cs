@@ -25,7 +25,7 @@ namespace NASCAR_Races_Server
         }
         public Car(Point startingPos, Point pitPos, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(startingPos.X, startingPos.Y, weight, 0.3f, maxHorsePower, worldInfo)
         {
-            CarName=carName;
+            CarName = carName;
             _worldInfo = worldInfo;
             _pitPos = pitPos;
         }
@@ -75,7 +75,7 @@ namespace NASCAR_Races_Server
                 Thread.Sleep(10);
             }
         }
-        
+
         public CarMapper CreateMap()
         {
             //carMapper.
@@ -88,7 +88,7 @@ namespace NASCAR_Races_Server
             };
             return this.MapPhysics(carMapper);
         }
-        
+
         public void CopyMapper(CarMapper map)
         {
             IsDisposable = map.IsDisposable;

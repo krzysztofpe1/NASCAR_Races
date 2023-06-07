@@ -29,7 +29,7 @@ namespace NASCAR_Races_Server
             }
         }
         public float HeadingAngle { get; set; } = 0;
-        
+
         //change to private for logs only
         public float _currentAcceleration { get; private set; }
         private float _mass { get; set; }
@@ -229,7 +229,7 @@ namespace NASCAR_Races_Server
                 }
 
                 X += Speed * timeElapsed;
-                
+
                 double distanceToPit = Math.Abs(_pitPos.X - X);
                 if (distanceToPit < _worldInf.CarLengthOfPittingManouver - 2 && X < _pitPos.X)
                 {
@@ -265,7 +265,7 @@ namespace NASCAR_Races_Server
                     //Debug.WriteLine(temp);
                     Y = (float)(bottomBorderPit - temp);
                 }
-                HeadingAngle = 180 + (float)Math.Atan((Ytemp - Y) / (Xtemp - X))* 20;
+                HeadingAngle = 180 + (float)Math.Atan((Ytemp - Y) / (Xtemp - X)) * 20;
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
@@ -550,7 +550,7 @@ namespace NASCAR_Races_Server
         }
         public CarMapper MapPhysics(CarMapper car)
         {
-            car.X = this.X; 
+            car.X = this.X;
             car.Y = this.Y;
             car.Length = this.Length;
             car.Width = this.Width;

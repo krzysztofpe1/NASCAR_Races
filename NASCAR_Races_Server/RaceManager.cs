@@ -24,8 +24,8 @@ namespace NASCAR_Races_Server
         private int _pitPosY;
         private int _turnCurveRadius;
 
-        private Point _nextStartingPos;
-        private Point _nextPitPos;
+        private int _nextCarNumber=1;
+
         private int _firstRow;
         private int _secondRow;
 
@@ -35,6 +35,10 @@ namespace NASCAR_Races_Server
         private static string _serverIP { get; } = "127.0.0.1";
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
+
+        private static Point _nextStartingPos;
+        private static Point _nextPitPos;
+        public bool IsRaceStarted = false;
 
         public WorldInformation Worldinformation { get; }
 
@@ -50,23 +54,11 @@ namespace NASCAR_Races_Server
             _pitPosY = pitPosY;
             _turnCurveRadius = turnCurveRadius;
 
-            _nextStartingPos = new Point();
-            _firstRow = _canvasHeight / 2 + _turnRadius + penCircuitSize / 2;
-            _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 2;
-            _nextStartingPos.X = _canvasWidth / 2 + straightLength / 4;
-            _nextStartingPos.Y = _firstRow;
-
-
             _collisionCheckerThread = new(CheckCollisions);
             _tcpListenerThread = new(AwaitForCars);
             _tcpListenerThread.Start();
 
             Worldinformation = new WorldInformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
-
-            _nextPitPos = new Point();
-            _nextPitPos.Y = pitPosY - penCircuitSize / 4 + Worldinformation.CarWidth / 2;
-            Worldinformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
-            _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
         }
         public List<Car> getCars()
         {
@@ -118,7 +110,13 @@ namespace NASCAR_Races_Server
                 TcpClient dataClient = dataServer.AcceptTcpClient();
                 TcpClient commClient = commServer.AcceptTcpClient();
                 Debug.WriteLine("Connected");
-                ListOfCarHandlers.Add(new(dataClient, commClient, NextStartingPoint(), NextPitPoint()));
+                var temp = new CarClientHandler(dataClient, commClient, _nextCarNumber++);
+                ListOfCarHandlers.Add(temp);
+                Thread.Sleep(1000);
+                if(IsRaceStarted)
+                {
+                    temp.Start();
+                }
             }
         }
 
@@ -168,6 +166,7 @@ namespace NASCAR_Races_Server
 
         public void StartRace()
         {
+            IsRaceStarted = true;
             ListOfCarHandlers.ForEach(handler => { handler.Start(); });
             _collisionCheckerThread.Start();
         }

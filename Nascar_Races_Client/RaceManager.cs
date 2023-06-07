@@ -18,15 +18,16 @@ namespace Nascar_Races_Client
         private int _canvasHeight;
         //private int _penCircuitSize;
 
-        private int _straightLength;
+        private static int _straightLength;
         private int _turnRadius;
         private int _pitPosY;
         private int _turnCurveRadius;
 
-        private Point _nextStartingPos;
-        private Point _nextPitPos;
-        private int _firstRow;
-        private int _secondRow;
+        private static Point _nextStartingPos;
+        private static Point _nextPitPos;
+        private static int _firstRow;
+        private static int _secondRow;
+        private static int _carLength;
 
 
         public WorldInformation WorldInformation { get; }
@@ -54,7 +55,8 @@ namespace Nascar_Races_Client
             _nextPitPos.Y = pitPosY - penCircuitSize / 4 + WorldInformation.CarWidth / 2;
             WorldInformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
             _nextPitPos.X = WorldInformation.x2 - WorldInformation.CarLength;
-            _client = new ClientTCPHandler(WorldInformation, NextStartingPoint(), NextPitPoint());
+            _client = new ClientTCPHandler(WorldInformation);
+            _carLength = WorldInformation.CarLength;
         }
         public List<Car> getCars()
         {
@@ -63,17 +65,17 @@ namespace Nascar_Races_Client
             return temp;
         }
 
-        private Point NextStartingPoint()
+        public static Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
             _nextStartingPos.X -= _straightLength / 30;
             _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
             return tempPoint;
         }
-        private Point NextPitPoint()
+        public static Point NextPitPoint()
         {
             Point temp = new(_nextPitPos.X, _nextPitPos.Y);
-            _nextPitPos.X -= WorldInformation.CarLength * 4;
+            _nextPitPos.X -= _carLength * 4;
             return temp;
         }
 

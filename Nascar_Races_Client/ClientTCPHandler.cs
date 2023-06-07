@@ -12,7 +12,7 @@ namespace Nascar_Races_Client
 {
     internal class ClientTCPHandler
     {
-        private static int startRaceSignal { get; } = 1;
+        private static int startRaceSignal { get; } = 420;
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
         private static string _serverIP { get; } = "127.0.0.1";
@@ -26,13 +26,31 @@ namespace Nascar_Races_Client
         private BinaryFormatter _binaryFormatter;
         public Car MyCar { get; private set; }
         public Thread CarThread { get; private set; }
-        public ClientTCPHandler(WorldInformation worldInf, Point startingPos, Point pitPos)
+        public ClientTCPHandler(WorldInformation worldInf)
         {
             _binaryFormatter = new BinaryFormatter();
-            MyCar = new(startingPos, pitPos, 1000, "1", 30000, worldInf);
-            CarThread = new(MyCar.Move);
+            
             if (Connect())
             {
+                byte[] comm = new byte[54];
+                _commStream.Read(comm);
+                using (var ms = new MemoryStream(comm))
+                {
+                    var formatter = new BinaryFormatter();
+                    int deserialized = (int)formatter.Deserialize(ms);
+                    Debug.WriteLine(deserialized);
+                    Point startingPos=new Point();
+                    Point pitPos = new Point();
+                    int temp = 0;
+                    while (temp++ < deserialized)
+                    {
+                        startingPos = RaceManager.NextStartingPoint();
+                        pitPos = RaceManager.NextPitPoint();
+                    }
+                    MyCar = new(startingPos, pitPos, 1000, deserialized.ToString(), 30000, worldInf);
+                    CarThread = new(MyCar.Move);
+                }
+                Debug.Write(" TUTAJ WESZŁO");
                 CarThread = new(MyCar.Move);
                 _dataThread = new(ExchangeData);
                 _dataThread.Start();
@@ -44,6 +62,7 @@ namespace Nascar_Races_Client
 
             }
         }
+
         public void StartCar()
         {
             MyCar.Started = true;

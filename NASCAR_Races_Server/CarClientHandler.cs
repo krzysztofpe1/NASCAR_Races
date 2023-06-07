@@ -10,30 +10,26 @@ using System.Threading.Tasks;
 
 namespace NASCAR_Races_Server
 {
-    public class CarClientHandler
+    internal class CarClientHandler
     {
-        private static int startRaceSignal { get; } = 1;
+        private static int startRaceSignal { get; } = 420;
         private TcpClient _dataClient;
         private TcpClient _commClient;
         private NetworkStream _dataStream;
         private NetworkStream _commStream;
-        private Point _startingPoint { get; set; }
-        private Point _pitPoint { get; set; }
+
         private Car _myCar;
         private Thread _dataThread;
         private Thread _commThread;
         private BinaryFormatter _binaryFormatter;
         private int _dataLength = 919;
-        public CarClientHandler(TcpClient dataClient, TcpClient commClient, Point startingPoint, Point pitPoint)
+        public CarClientHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
         {
             _dataClient = dataClient;
             _dataStream = _dataClient.GetStream();
 
             _commClient = commClient;
             _commStream = _commClient.GetStream();
-
-            _startingPoint = startingPoint;
-            _pitPoint = pitPoint;
 
             _myCar = new();
 
@@ -44,6 +40,7 @@ namespace NASCAR_Races_Server
 
             _commThread = new(ExchangeComm);
             //_commThread.Start();
+            SendComm(myCarNumber);
         }
         private void ExchangeData()
         {
