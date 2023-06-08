@@ -7,7 +7,7 @@ using NASCAR_Races_Server;
 
 namespace Nascar_Races_Client
 {
-    public class Physics
+    public class Physics : DrawableCar
     {
         const float accelerationOfGravity = 9.81f;
         const float trackAngle = 0.175f;

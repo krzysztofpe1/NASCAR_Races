@@ -12,10 +12,9 @@ namespace Nascar_Races_Client
 {
     internal class ClientTCPHandler
     {
-        private static int startRaceSignal { get; } = 420;
-        private static int _dataPort { get; } = 2000;
-        private static int _commPort { get; } = 2001;
-        private static string _serverIP { get; } = "127.0.0.1";
+        private const int _dataPort = 2000;
+        private const int _commPort = 2001;
+        private const string _serverIP = "127.0.0.1";
         private TcpClient _dataClient;
         private TcpClient _commClient;
         private NetworkStream _dataStream;
@@ -25,11 +24,18 @@ namespace Nascar_Races_Client
         public bool IsDisposable { get; private set; } = false;
         private BinaryFormatter _binaryFormatter;
         public Car MyCar { get; private set; }
+        private List<CarMapper> _opponents { get; set; }
         public Thread CarThread { get; private set; }
+
+        private Point _startingPos = new Point();
+        private Point _pitPos = new Point();
+        private WorldInformation _worldInformation;
+        private int _carNumber;
         public ClientTCPHandler(WorldInformation worldInf)
         {
             _binaryFormatter = new BinaryFormatter();
-            
+
+            _opponents = new();
             if (Connect())
             {
                 byte[] comm = new byte[54];
@@ -38,16 +44,15 @@ namespace Nascar_Races_Client
                 {
                     var formatter = new BinaryFormatter();
                     int deserialized = (int)formatter.Deserialize(ms);
-                    Debug.WriteLine(deserialized);
-                    Point startingPos=new Point();
-                    Point pitPos = new Point();
+                    _worldInformation = worldInf;
+                    _carNumber = deserialized;
                     int temp = 0;
                     while (temp++ < deserialized)
                     {
-                        startingPos = RaceManager.NextStartingPoint();
-                        pitPos = RaceManager.NextPitPoint();
+                        _startingPos = RaceManager.NextStartingPoint();
+                        _pitPos = RaceManager.NextPitPoint();
                     }
-                    MyCar = new(startingPos, pitPos, 1000, deserialized.ToString(), 30000, worldInf);
+                    MyCar = new(_startingPos, _pitPos, 1000, deserialized.ToString(), 30000, worldInf);
                     CarThread = new(MyCar.Move);
                 }
                 Debug.Write(" TUTAJ WESZŁO");
@@ -62,6 +67,16 @@ namespace Nascar_Races_Client
             {
 
             }
+        }
+        public List<DrawableCar> GetCars()
+        {
+            List<DrawableCar> cars = new List<DrawableCar>
+            {
+                MyCar.CreateMap()
+            };
+            cars.AddRange(_opponents);
+
+            return cars;
         }
 
         private bool Connect()
@@ -101,12 +116,27 @@ namespace Nascar_Races_Client
                 {
                     var formatter = new BinaryFormatter();
                     int deserialized = (int)formatter.Deserialize(ms);
-                    if(deserialized == startRaceSignal)
+                    switch(deserialized)
                     {
-                        MyCar.Started = true;
+                        case TCPSignals.startRaceSignal:
+                            MyCar.Started = true;
+                            break;
+                        case TCPSignals.endRaceSignal:
+                            RestartCar();
+                            break;
+                        case TCPSignals.killCarSignal:
+                            MyCar.IsDisposable = true;
+                            break;
+                        default: break;
                     }
                 }
             }
+        }
+        private void RestartCar()
+        {
+            MyCar.IsDisposable = true;
+            MyCar = new(_startingPos, _pitPos, 1000, _carNumber.ToString(), 30000, _worldInformation);
+            CarThread = new(MyCar.Move);
         }
         private byte[] SerializeCar()
         {

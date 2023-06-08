@@ -31,6 +31,7 @@ namespace Nascar_Races_Client
         }
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
+            _painter.listOfCars= _raceManager.getCars();
             _painter.PaintCircuit(e.Graphics);
             _painter.PaintCarsPosition(e.Graphics);
         }

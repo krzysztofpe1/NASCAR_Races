@@ -58,11 +58,9 @@ namespace Nascar_Races_Client
             _client = new ClientTCPHandler(WorldInformation);
             _carLength = WorldInformation.CarLength;
         }
-        public List<Car> getCars()
+        public List<DrawableCar> getCars()
         {
-            var temp = new List<Car>();
-            temp.Add(_client.MyCar);
-            return temp;
+            return _client.GetCars();
         }
 
         public static Point NextStartingPoint()

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace NASCAR_Races_Server
 {
     [Serializable]
-    public class CarMapper
+    public class CarMapper : DrawableCar
     {
         public enum STATE
         {
@@ -24,14 +24,7 @@ namespace NASCAR_Races_Server
         public string CarName;
         public float MaxHorsePower;
 
-
-
-        public float X;
-        public float Y;
-        public float Length;
-        public float Width;
         public float Speed;
-        public float HeadingAngle;
 
         public float FuelMass;
         public float FuelBurningRatio;

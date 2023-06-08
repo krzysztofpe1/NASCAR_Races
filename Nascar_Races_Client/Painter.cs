@@ -21,7 +21,7 @@ namespace Nascar_Races_Client
         private Pen _penCar;
         private int _halfPaintBrushSize = 30;
         //Points of start and end of the straights
-        public List<Car> listOfCars { get; set; }
+        public List<DrawableCar> listOfCars { get; set; }
         private int _x1, _x2;
 
         private WorldInformation _worldinformation;
@@ -37,22 +37,7 @@ namespace Nascar_Races_Client
             _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;
             _x2 = _canvasWidth / 2 + _straightLength / 2;
-            listOfCars = new List<Car>();
-        }
-        public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
-        {
-            _canvasWidth = canvasWidth;
-            _canvasHeight = canvasHeight;
-            _straightLength = straightLength;
-            _turnRadius = turnRadius;
-            _pitPosY = pitPosY;
-
-            _halfPaintBrushSize = penCircuitSize / 2;
-            _penCircuit = new Pen(Color.Black, _halfPaintBrushSize * 2);
-            _penPit = new Pen(Color.Orange, _halfPaintBrushSize);
-            _penCar = new Pen(Color.Red, 5);//size of paint brush for car
-            _x1 = _canvasWidth / 2 - _straightLength / 2;
-            _x2 = _canvasWidth / 2 + _straightLength / 2;
+            listOfCars = new();
         }
         public void PaintCircuit(Graphics g)
         {
@@ -88,7 +73,7 @@ namespace Nascar_Races_Client
             //listOfCars.ForEach(car => { WriteLogs(car); });
         }
 
-        private void PaintCar(Graphics g, Car car)
+        private void PaintCar(Graphics g, DrawableCar car)
         {
             if (!float.IsNaN(car.X))
             {
