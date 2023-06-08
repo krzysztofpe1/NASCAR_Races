@@ -34,7 +34,7 @@ namespace NASCAR_Races_Server
         public float _currentAcceleration { get; private set; }
         private float _mass { get; set; }
         private float _frictionofweels { get; set; }
-        private System.DateTime _lastExecutionTime { get; set; }
+        protected System.DateTime _lastExecutionTime { get; set; }
 
         protected Point _leftCircle { get; set; }
         protected Point _rightCircle { get; set; }

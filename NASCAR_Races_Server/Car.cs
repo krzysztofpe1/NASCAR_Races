@@ -38,7 +38,11 @@ namespace NASCAR_Races_Server
             int counter = 0;
             while (!IsDisposable)
             {
-                if (!Started) continue;
+                if (!Started)
+                {
+                    _lastExecutionTime = DateTime.Now;
+                    continue;
+                }
                 //refreshing neighbouring cars list every 10 iterations
                 if (++counter >= 5)
                 //if (true)

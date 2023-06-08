@@ -1,0 +1,5 @@
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Release\net6.0-windows\publish\NASCAR_Races_Server.exe
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Release\net6.0-windows\publish\NASCAR_Races_Server.dll
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Release\net6.0-windows\publish\NASCAR_Races_Server.deps.json
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Release\net6.0-windows\publish\NASCAR_Races_Server.runtimeconfig.json
+Y:\C#\NASCAR_Races\NASCAR_Races_Server\bin\Release\net6.0-windows\publish\NASCAR_Races_Server.pdb

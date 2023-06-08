@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Nascar_Races_Client/1.0.0": {
+        "dependencies": {
+          "NASCAR_Races_Server": "1.0.0"
+        },
+        "runtime": {
+          "Nascar_Races_Client.dll": {}
+        }
+      },
+      "NASCAR_Races_Server/1.0.0": {
+        "runtime": {
+          "NASCAR_Races_Server.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Nascar_Races_Client/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NASCAR_Races_Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

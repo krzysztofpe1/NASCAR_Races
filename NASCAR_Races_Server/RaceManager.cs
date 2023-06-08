@@ -168,7 +168,7 @@ namespace NASCAR_Races_Server
         {
             IsRaceStarted = true;
             ListOfCarHandlers.ForEach(handler => { handler.Start(); });
-            _collisionCheckerThread.Start();
+            //_collisionCheckerThread.Start();
         }
         public void KillThreads()
         {

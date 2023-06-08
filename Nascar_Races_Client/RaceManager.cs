@@ -78,12 +78,6 @@ namespace Nascar_Races_Client
             _nextPitPos.X -= _carLength * 4;
             return temp;
         }
-
-        public void StartRace()
-        {
-            //TODO przenies to gdzies
-            _client.StartCar();
-        }
         public void PrepareRace()
         {
             //MyCar = new Car();

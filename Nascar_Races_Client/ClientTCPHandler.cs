@@ -52,6 +52,7 @@ namespace Nascar_Races_Client
                 }
                 Debug.Write(" TUTAJ WESZŁO");
                 CarThread = new(MyCar.Move);
+                CarThread.Start();
                 _dataThread = new(ExchangeData);
                 _dataThread.Start();
                 _commThread = new(ExchangeComm);
@@ -61,11 +62,6 @@ namespace Nascar_Races_Client
             {
 
             }
-        }
-
-        public void StartCar()
-        {
-            MyCar.Started = true;
         }
 
         private bool Connect()
@@ -106,7 +102,7 @@ namespace Nascar_Races_Client
                     int deserialized = (int)formatter.Deserialize(ms);
                     if(deserialized == startRaceSignal)
                     {
-                        CarThread.Start();
+                        MyCar.Started = true;
                     }
                 }
             }
