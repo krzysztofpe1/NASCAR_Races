@@ -13,7 +13,7 @@ namespace NASCAR_Races_Server
 {
     internal class RaceManager
     {
-        public List<CarClientHandler> ListOfCarHandlers { get; private set; }
+        public List<ServerTCPHandler> ListOfCarHandlers { get; private set; }
 
         private int _canvasWidth;
         private int _canvasHeight;
@@ -44,7 +44,7 @@ namespace NASCAR_Races_Server
 
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, PictureBox mainPictureBox)
         {
-            ListOfCarHandlers = new List<CarClientHandler>();
+            ListOfCarHandlers = new List<ServerTCPHandler>();
             _canvasWidth = mainPictureBox.Width;
             _canvasHeight = mainPictureBox.Height;
             //_penCircuitSize = penCircuitSize;
@@ -60,9 +60,9 @@ namespace NASCAR_Races_Server
 
             Worldinformation = new WorldInformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
         }
-        public List<Car> getCars()
+        public List<CarMapper> getCars()
         {
-            var temp = new List<Car>();
+            var temp = new List<CarMapper>();
             ListOfCarHandlers.ForEach(handler => { temp.Add(handler.GetCar()); });
             return temp;
         }
@@ -70,19 +70,19 @@ namespace NASCAR_Races_Server
         private void CheckCollisions()
         {
             //creating list of cars
-            List<Car>listOfCars = new List<Car>();
+            List<CarMapper>listOfCars = new List<CarMapper>();
             foreach(var handler in ListOfCarHandlers)
             {
                 listOfCars.Add(handler.GetCar());
             }
             while (!_killCollisionChecker)
             {
-                foreach (Car car1 in listOfCars)
+                foreach (CarMapper car1 in listOfCars)
                 {
-                    if (car1.State != Car.STATE.ON_CIRCUIT && car1.State != Car.STATE.ON_WAY_TO_PIT_STOP)
+                    if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
                         continue;
 
-                    foreach (Car car2 in listOfCars)
+                    foreach (CarMapper car2 in listOfCars)
                     {
                         if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
                             continue;
@@ -110,7 +110,7 @@ namespace NASCAR_Races_Server
                 TcpClient dataClient = dataServer.AcceptTcpClient();
                 TcpClient commClient = commServer.AcceptTcpClient();
                 Debug.WriteLine("Connected");
-                var temp = new CarClientHandler(dataClient, commClient, _nextCarNumber++);
+                var temp = new ServerTCPHandler(dataClient, commClient, _nextCarNumber++);
                 ListOfCarHandlers.Add(temp);
                 Thread.Sleep(1000);
                 if(IsRaceStarted)
@@ -120,7 +120,7 @@ namespace NASCAR_Races_Server
             }
         }
 
-        private bool AreRectanglesColliding(Car car1, Car car2)
+        private bool AreRectanglesColliding(CarMapper car1, CarMapper car2)
         {
             double car1MinX = car1.X - car1.Length / 2;
             double car1MaxX = car1.X + car1.Length / 2;

@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection.Metadata;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace NASCAR_Races_Server
 {
-    internal class CarClientHandler
+    internal class ServerTCPHandler
     {
         private static int startRaceSignal { get; } = 420;
         private TcpClient _dataClient;
@@ -18,12 +19,12 @@ namespace NASCAR_Races_Server
         private NetworkStream _dataStream;
         private NetworkStream _commStream;
 
-        private Car _myCar;
+        private CarMapper _myCar;
         private Thread _dataThread;
         private Thread _commThread;
-        private BinaryFormatter _binaryFormatter;
-        private int _dataLength = 919;
-        public CarClientHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
+        private BinaryFormatter _formatter;
+        private int _dataLength;
+        public ServerTCPHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
         {
             _dataClient = dataClient;
             _dataStream = _dataClient.GetStream();
@@ -33,7 +34,8 @@ namespace NASCAR_Races_Server
 
             _myCar = new();
 
-            _binaryFormatter = new BinaryFormatter();
+            _formatter = new();
+            _dataLength = DefineBufferSizeForCarMapperRawData();
 
             _dataThread = new(ExchangeData);
             _dataThread.Start();
@@ -48,8 +50,8 @@ namespace NASCAR_Races_Server
             {
                 byte[] response = new byte[_dataLength];
                 int bytesRead = _dataStream.Read(response, 0, _dataLength);
-                var temp = DeserializeData(response);
-                _myCar.CopyMapper(temp);
+                var temp = DeserializeCar(response);
+                _myCar = temp;
             }
         }
         private void ExchangeComm()
@@ -63,22 +65,54 @@ namespace NASCAR_Races_Server
         {
             using (var ms = new MemoryStream())
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, signal);
+                _formatter.Serialize(ms, signal);
                 _commStream.Write(ms.ToArray());
                 Debug.WriteLine(ms.ToArray().Length);
             }
         }
-        private CarMapper DeserializeData(byte[] response)
+        private byte[] SerializeCar()
+        {
+            using (MemoryStream stream = new())
+            {
+                var formatter = new BinaryFormatter();
+                _formatter.Serialize(stream, _myCar);
+                return stream.ToArray();
+            }
+        }
+        private int DefineBufferSizeForCarMapperRawData()
+        {
+            using (MemoryStream stream = new())
+            {
+                var formatter = new BinaryFormatter();
+                CarMapper temp = new()
+                {
+                    IsDisposable = true,
+                    CarName = "1",
+                    MaxHorsePower = 1,
+                    X = 0,
+                    Y = 0,
+                    Length = 0,
+                    Width = 0,
+                    Speed = 0,
+                    HeadingAngle = 0,
+                    FuelMass = 0,
+                    FuelBurningRatio = 0,
+                    CurrentHorsePower = 0,
+                    State = CarMapper.STATE.ON_WAY_TO_PIT_STOP
+                };
+                _formatter.Serialize(stream, temp);
+                return stream.ToArray().Length;
+            }
+        }
+        private CarMapper DeserializeCar(byte[] response)
         {
             using(MemoryStream memoryStream = new MemoryStream(response))
             {
-                var formatter = new BinaryFormatter();
-                var myobject = (CarMapper)formatter.Deserialize(memoryStream);
+                var myobject = (CarMapper)_formatter.Deserialize(memoryStream);
                 return myobject;
             }
         }
-        public Car GetCar()
+        public CarMapper GetCar()
         {
             return _myCar;
         }

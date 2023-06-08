@@ -7,7 +7,7 @@ using System.Diagnostics;
 using NASCAR_Races_Server;
 using System.Security.Cryptography.X509Certificates;
 
-namespace NASCAR_Races_Server
+namespace Nascar_Races_Client
 {
     public class Car : Physics
     {
@@ -87,7 +87,6 @@ namespace NASCAR_Races_Server
             {
                 //CAR variables
                 IsDisposable = this.IsDisposable,
-                Started = this.Started,
                 CarName = this.CarName,
             };
             return this.MapPhysics(carMapper);
@@ -96,7 +95,6 @@ namespace NASCAR_Races_Server
         public void CopyMapper(CarMapper map)
         {
             IsDisposable = map.IsDisposable;
-            Started = map.Started;
             CarName = map.CarName;
             base.CopyMapper(map);
         }

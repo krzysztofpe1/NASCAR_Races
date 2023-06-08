@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races_Server
+namespace Nascar_Races_Client
 {
     public class WorldInformation
     {
@@ -38,7 +38,7 @@ namespace NASCAR_Races_Server
         public int x1;
         public int x2;
 
-        public List<CarMapper> ListOfCars { get; set; }
+        public List<Car> ListOfCars { get; set; }
 
         public WorldInformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
         {
@@ -64,10 +64,10 @@ namespace NASCAR_Races_Server
         }
 
         //returns List<Car> that are in CarViewingRadius of callerCar
-        public List<CarMapper> NearbyCars(CarMapper callerCar)
+        public List<Car> NearbyCars(Car callerCar)
         {
-            return new List<CarMapper>(); //TODO zmienic to
-            List<CarMapper> res = new List<CarMapper>();
+            return new List<Car>(); //TODO zmienic to
+            List<Car> res = new List<Car>();
             ListOfCars.ForEach(car =>
             {
                 if (callerCar != car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2) && car.IsDisposable != true)
@@ -85,7 +85,7 @@ namespace NASCAR_Races_Server
             BOTTOM,
             PIT
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(CarMapper car)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car)
         {
             return WhatPartOfCircuitIsCarOn(car.X, car.Y);
         }
@@ -97,7 +97,7 @@ namespace NASCAR_Races_Server
             if (y > CanvasCenterY) return CIRCUIT_PARTS.BOTTOM;
             return CIRCUIT_PARTS.PIT;
         }
-        public float DistanceToEdgeOfTrack(CarMapper car, bool outerEdge = true)
+        public float DistanceToEdgeOfTrack(Physics car, bool outerEdge = true)
         {
             var part = WhatPartOfCircuitIsCarOn(car);
             if (part == CIRCUIT_PARTS.TOP)

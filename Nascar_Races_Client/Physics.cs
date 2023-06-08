@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Microsoft.VisualBasic.Logging;
 using NASCAR_Races_Server;
 
-namespace NASCAR_Races_Server
+namespace Nascar_Races_Client
 {
     public class Physics
     {
@@ -556,21 +556,10 @@ namespace NASCAR_Races_Server
             car.Width = this.Width;
             car.Speed = this.Speed;
             car.HeadingAngle = this.HeadingAngle;
-            car._currentAcceleration = this._currentAcceleration;
-            car._mass = this._mass;
-            car._frictionofweels = this._frictionofweels;
-            car._lastExecutionTime = this._lastExecutionTime;
-            car._leftCircle = this._leftCircle;
-            car._rightCircle = this._rightCircle;
-            car._circleRadius = this._circleRadius;
-            car._pitPos = this._pitPos;
             car.FuelMass = this.FuelMass;
             //car.FuelBurningRatio = this.FuelBurningRatio;
             car.MaxHorsePower = this.MaxHorsePower;
             car.CurrentHorsePower = this.CurrentHorsePower;
-            car._recalculateHeadingAngle = this._recalculateHeadingAngle;
-            car.currentTurnAngle = this.currentTurnAngle;
-            car._carSafeDistance = this._carSafeDistance;
             car.State = (CarMapper.STATE)this.State;
             return car;
         }
@@ -583,21 +572,10 @@ namespace NASCAR_Races_Server
             this.Width = car.Width;
             this.Speed = car.Speed;
             this.HeadingAngle = car.HeadingAngle;
-            this._currentAcceleration = car._currentAcceleration;
-            this._mass = car._mass;
-            this._frictionofweels = car._frictionofweels;
-            this._lastExecutionTime = car._lastExecutionTime;
-            this._leftCircle = car._leftCircle;
-            this._rightCircle = car._rightCircle;
-            this._circleRadius = car._circleRadius;
-            this._pitPos = car._pitPos;
             this.FuelMass = car.FuelMass;
             //this.FuelBurningRatio = car.FuelBurningRatio;
             this.MaxHorsePower = car.MaxHorsePower;
             this.CurrentHorsePower = car.CurrentHorsePower;
-            this._recalculateHeadingAngle = car._recalculateHeadingAngle;
-            this.currentTurnAngle = car.currentTurnAngle;
-            this._carSafeDistance = car._carSafeDistance;
             this.State = (STATE)car.State;
         }
     }

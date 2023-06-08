@@ -87,6 +87,7 @@ namespace Nascar_Races_Client
                 //sending my object to server every iteration
                 var myObjectSerialized = SerializeCar();
                 _dataStream.Write(myObjectSerialized, 0, myObjectSerialized.Length);
+                Debug.WriteLine(myObjectSerialized.Length);
 
             }
         }

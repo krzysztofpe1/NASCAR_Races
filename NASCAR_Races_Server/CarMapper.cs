@@ -21,7 +21,6 @@ namespace NASCAR_Races_Server
         }
 
         public bool IsDisposable;
-        public bool Started;
         public string CarName;
         public float MaxHorsePower;
 
@@ -33,26 +32,11 @@ namespace NASCAR_Races_Server
         public float Width;
         public float Speed;
         public float HeadingAngle;
-        public float _currentAcceleration;
-        public float _mass;
-        public float _frictionofweels;
-        public System.DateTime _lastExecutionTime;
-
-        public Point _leftCircle;
-        public Point _rightCircle;
-        public int _circleRadius;
-        public Point _pitPos;
 
         public float FuelMass;
         public float FuelBurningRatio;
 
         public float CurrentHorsePower;
-
-        public bool _recalculateHeadingAngle;
-
-        public double currentTurnAngle;
-
-        public int _carSafeDistance;
         public STATE State;
 
         public CarMapper() { }
