@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
-    public class Worldinformation
+    public class WorldInformation
     {
         public int CanvasWidth { get; }
         public int CanvasHeight { get; }
@@ -38,9 +38,9 @@ namespace NASCAR_Races
         public int x1;
         public int x2;
 
-        public List<Car> ListOfCars { get; set; }
+        public List<CarMapper> ListOfCars { get; set; }
 
-        public Worldinformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
+        public WorldInformation(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, int carViewingRadius, PictureBox mainPictureBox)
         {
             CanvasWidth = mainPictureBox.Width;
             CanvasHeight = mainPictureBox.Height;
@@ -64,9 +64,10 @@ namespace NASCAR_Races
         }
 
         //returns List<Car> that are in CarViewingRadius of callerCar
-        public List<Car> NearbyCars(Car callerCar)
+        public List<CarMapper> NearbyCars(CarMapper callerCar)
         {
-            List<Car> res = new List<Car>();
+            return new List<CarMapper>(); //TODO zmienic to
+            List<CarMapper> res = new List<CarMapper>();
             ListOfCars.ForEach(car =>
             {
                 if (callerCar != car && Math.Pow(callerCar.X - car.X, 2) + Math.Pow(callerCar.Y - car.Y, 2) <= Math.Pow(CarViewingRadius, 2) && car.IsDisposable != true)
@@ -84,7 +85,7 @@ namespace NASCAR_Races
             BOTTOM,
             PIT
         }
-        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(Physics car)
+        public CIRCUIT_PARTS WhatPartOfCircuitIsCarOn(CarMapper car)
         {
             return WhatPartOfCircuitIsCarOn(car.X, car.Y);
         }
@@ -96,7 +97,7 @@ namespace NASCAR_Races
             if (y > CanvasCenterY) return CIRCUIT_PARTS.BOTTOM;
             return CIRCUIT_PARTS.PIT;
         }
-        public float DistanceToEdgeOfTrack(Physics car, bool outerEdge = true)
+        public float DistanceToEdgeOfTrack(CarMapper car, bool outerEdge = true)
         {
             var part = WhatPartOfCircuitIsCarOn(car);
             if (part == CIRCUIT_PARTS.TOP)

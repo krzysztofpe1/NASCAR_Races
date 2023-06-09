@@ -1,11 +1,33 @@
 {
   "version": 3,
   "targets": {
-    "net6.0-windows7.0": {}
+    "net6.0-windows7.0": {
+      "NASCAR_Races_Server/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/NASCAR_Races_Server.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NASCAR_Races_Server.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WindowsForms"
+        ]
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "NASCAR_Races_Server/1.0.0": {
+      "type": "project",
+      "path": "../NASCAR_Races_Server/NASCAR_Races_Server.csproj",
+      "msbuildProject": "../NASCAR_Races_Server/NASCAR_Races_Server.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0-windows7.0": []
+    "net6.0-windows7.0": [
+      "NASCAR_Races_Server >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\krzys\\.nuget\\packages\\": {},
@@ -39,7 +61,11 @@
       "frameworks": {
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
-          "projectReferences": {}
+          "projectReferences": {
+            "Y:\\C#\\NASCAR_Races\\NASCAR_Races_Server\\NASCAR_Races_Server.csproj": {
+              "projectPath": "Y:\\C#\\NASCAR_Races\\NASCAR_Races_Server\\NASCAR_Races_Server.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

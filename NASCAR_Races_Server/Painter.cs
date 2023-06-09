@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
-    public class Painter
+    internal class Painter
     {
         private int _canvasWidth;
         private int _canvasHeight;
@@ -19,11 +20,11 @@ namespace NASCAR_Races
         private Pen _penCar;
         private int _halfPaintBrushSize = 30;
         //Points of start and end of the straights
-        public List<Car> listOfCars { set; get; }
+        public List<CarMapper> listOfCars { get; set; }
         private int _x1, _x2;
 
-        private Worldinformation _worldinformation;
-        public Painter(Worldinformation worldinformation)
+        private WorldInformation _worldinformation;
+        public Painter(WorldInformation worldinformation)
         {
             _canvasHeight = worldinformation.CanvasHeight;
             _canvasWidth = worldinformation.CanvasWidth;
@@ -35,21 +36,7 @@ namespace NASCAR_Races
             _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;
             _x2 = _canvasWidth / 2 + _straightLength / 2;
-        }
-        public Painter(int canvasWidth, int canvasHeight, int straightLength, int turnRadius, int pitPosY, int penCircuitSize)
-        {
-            _canvasWidth = canvasWidth;
-            _canvasHeight = canvasHeight;
-            _straightLength = straightLength;
-            _turnRadius = turnRadius;
-            _pitPosY = pitPosY;
-
-            _halfPaintBrushSize = penCircuitSize / 2;
-            _penCircuit = new Pen(Color.Black, _halfPaintBrushSize * 2);
-            _penPit = new Pen(Color.Orange, _halfPaintBrushSize);
-            _penCar = new Pen(Color.Red, 5);//size of paint brush for car
-            _x1 = _canvasWidth / 2 - _straightLength / 2;
-            _x2 = _canvasWidth / 2 + _straightLength / 2;
+            listOfCars = new List<CarMapper>();
         }
         public void PaintCircuit(Graphics g)
         {
@@ -74,13 +61,16 @@ namespace NASCAR_Races
 
         public void PaintCarsPosition(Graphics g)
         {
-            if (listOfCars.Count() == 0) throw new InvalidOperationException("List of cars is empty");
+            if (listOfCars.Count() == 0)
+            {
+                return;
+            }
             listOfCars.ForEach(car => { PaintCar(g, car); });
             //Console.Clear();
             //listOfCars.ForEach(car => { WriteLogs(car); });
         }
 
-        private void PaintCar(Graphics g, Car car)
+        private void PaintCar(Graphics g, CarMapper car)
         {
             if (!float.IsNaN(car.X))
             {

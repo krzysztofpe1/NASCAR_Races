@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-namespace NASCAR_Races
+using System.Net.Sockets;
+using System.Net;
+
+namespace NASCAR_Races_Server
 {
-    public class RaceManager
+    internal class RaceManager
     {
-        public List<CarThread> ListOfCarThreads;
-        public List<Car> ListOfCars;
+        public List<ServerTCPHandler> ListOfCarHandlers { get; private set; }
 
         private int _canvasWidth;
         private int _canvasHeight;
@@ -22,18 +24,27 @@ namespace NASCAR_Races
         private int _pitPosY;
         private int _turnCurveRadius;
 
-        private Point _nextStartingPos;
-        private Point _nextPitPos;
+        private int _nextCarNumber=1;
+
         private int _firstRow;
         private int _secondRow;
 
-        private Thread _thread;
+        private Thread _collisionCheckerThread;
+        private Thread _tcpListenerThread;
         private bool _killCollisionChecker = false;
+        private static string _serverIP { get; } = "192.168.0.100";
+        private static int _dataPort { get; } = 2000;
+        private static int _commPort { get; } = 2001;
 
-        public Worldinformation Worldinformation { get; }
+        private static Point _nextStartingPos;
+        private static Point _nextPitPos;
+        public bool IsRaceStarted = false;
+
+        public WorldInformation Worldinformation { get; }
 
         public RaceManager(int straightLength, int turnRadius, int pitPosY, int turnCurveRadius, int penCircuitSize, int penCarSize, PictureBox mainPictureBox)
         {
+            ListOfCarHandlers = new List<ServerTCPHandler>();
             _canvasWidth = mainPictureBox.Width;
             _canvasHeight = mainPictureBox.Height;
             //_penCircuitSize = penCircuitSize;
@@ -43,56 +54,40 @@ namespace NASCAR_Races
             _pitPosY = pitPosY;
             _turnCurveRadius = turnCurveRadius;
 
-            _nextStartingPos = new Point();
-            _firstRow = _canvasHeight / 2 + _turnRadius + penCircuitSize / 2;
-            _secondRow = _canvasHeight / 2 + _turnRadius - penCircuitSize / 2;
-            _nextStartingPos.X = _canvasWidth / 2 + straightLength / 4;
-            _nextStartingPos.Y = _firstRow;
+            _collisionCheckerThread = new(CheckCollisions);
+            
+            _tcpListenerThread = new(AwaitForCars);
+            _tcpListenerThread.Start();
 
-
-            _thread = new(CheckCollisions);
-
-            Worldinformation = new Worldinformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
-
-            _nextPitPos = new Point();
-            _nextPitPos.Y = pitPosY - penCircuitSize / 4 + Worldinformation.CarWidth / 2;
-            Worldinformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
-            _nextPitPos.X = Worldinformation.x2 - Worldinformation.CarLength;
+            Worldinformation = new WorldInformation(straightLength, turnRadius, pitPosY, turnCurveRadius, penCircuitSize, penCarSize, 100, mainPictureBox);
+        }
+        public List<CarMapper> getCars()
+        {
+            var temp = new List<CarMapper>();
+            ListOfCarHandlers.ForEach(handler => { temp.Add(handler.GetCar()); });
+            return temp;
         }
 
-        public List<Car> CreateListOfCars()
+        /*private void CheckCollisions()
         {
-            Random random = new Random();
-            ListOfCarThreads = new List<CarThread>();
-            ListOfCars = new List<Car>();
-            for (int i = 0; i < Worldinformation.NumberOfCars; i++)
-            {
-                CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 15000 + (float)random.NextDouble() * 10000, Worldinformation);
-                //CarThread car = new(NextStartingPoint(), NextPitPoint(), 1000, i.ToString(), (random.NextDouble() <= 0.5) ? 30000 : 25000 + (float)random.NextDouble() * 5000, Worldinformation);
-                //Debug.WriteLine();
-                ListOfCarThreads.Add(car);
-                ListOfCars.Add((Car)car);
-            }
-            Worldinformation.ListOfCars = ListOfCars;
-            return ListOfCars;
-        }
-
-        private void CheckCollisions()
-        {
+            //creating list of cars
+            List<CarMapper>listOfCars = new List<CarMapper>();
+            ListOfCarHandlers.ForEach(handler => { listOfCars.Add(handler.GetCar()); });
             while (!_killCollisionChecker)
             {
-                foreach (Car car1 in ListOfCars)
+                foreach (CarMapper car1 in listOfCars)
                 {
-                    if (car1.State != Car.STATE.ON_CIRCUIT && car1.State != Car.STATE.ON_WAY_TO_PIT_STOP)
+                    if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
                         continue;
 
-                    foreach (Car car2 in ListOfCars)
+                    foreach (CarMapper car2 in listOfCars)
                     {
                         if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
                             continue;
 
                         if (AreRectanglesColliding(car1, car2))
                         {
+                            int index = listOfCars.IndexOf(car1);
                             car1.IsDisposable = true;
                             car2.IsDisposable = true;
                             Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
@@ -100,9 +95,61 @@ namespace NASCAR_Races
                     }
                 }
             }
+        }*/
+        private void CheckCollisions()
+        {
+            while (!_killCollisionChecker)
+            {
+                Dictionary<CarMapper, ServerTCPHandler> handlerMap = new();
+                ListOfCarHandlers.ForEach(handler =>
+                {
+                    handlerMap[handler.GetCar()] = handler;
+                });
+                foreach (KeyValuePair<CarMapper, ServerTCPHandler> pair1 in handlerMap)
+                {
+                    var car1 = pair1.Key;
+                    if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
+                        continue;
+                    foreach(KeyValuePair<CarMapper, ServerTCPHandler> pair2 in handlerMap)
+                    {
+                        var car2 = pair2.Key;
+                        if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
+                            continue;
+
+                        if (AreRectanglesColliding(car1, car2))
+                        {
+                            handlerMap[car1].Kill();
+                            handlerMap[car2].Kill();
+                            Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
+                        }
+                    }
+                }
+            }
         }
 
-        private bool AreRectanglesColliding(Car car1, Car car2)
+        private void AwaitForCars()
+        {
+            TcpListener dataServer = new(IPAddress.Parse(_serverIP), _dataPort);
+            TcpListener commServer = new(IPAddress.Parse(_serverIP), _commPort);
+            dataServer.Start();
+            commServer.Start();
+
+            while (true)
+            {
+                TcpClient dataClient = dataServer.AcceptTcpClient();
+                TcpClient commClient = commServer.AcceptTcpClient();
+                Debug.WriteLine("Connected");
+                var temp = new ServerTCPHandler(dataClient, commClient, _nextCarNumber++);
+                ListOfCarHandlers.Add(temp);
+                temp.AllCarHandlers = ListOfCarHandlers;
+                if(IsRaceStarted)
+                {
+                    temp.Start();
+                }
+            }
+        }
+
+        private bool AreRectanglesColliding(CarMapper car1, CarMapper car2)
         {
             double car1MinX = car1.X - car1.Length / 2;
             double car1MaxX = car1.X + car1.Length / 2;
@@ -132,13 +179,6 @@ namespace NASCAR_Races
 
             return true;
         }
-
-
-
-
-
-
-
         private Point NextStartingPoint()
         {
             Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
@@ -155,13 +195,13 @@ namespace NASCAR_Races
 
         public void StartRace()
         {
-            ListOfCarThreads.ForEach(carThread => { carThread.StartCar(); });
-            _thread.Start();
+            IsRaceStarted = true;
+            ListOfCarHandlers.ForEach(handler => { handler.Start(); });
+            _collisionCheckerThread.Start();
         }
         public void KillThreads()
         {
             _killCollisionChecker = true;
-            ListOfCarThreads.ForEach(carThread => { carThread.Kill(); });
         }
     }
 }

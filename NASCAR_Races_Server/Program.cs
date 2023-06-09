@@ -1,4 +1,4 @@
-namespace NASCAR_Races
+namespace NASCAR_Races_Server
 {
     internal static class Program
     {
@@ -6,7 +6,7 @@ namespace NASCAR_Races
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            MainWindow mainWindow = new MainWindow();
+            MainServerWindow mainWindow = new MainServerWindow();
             Application.Run(mainWindow);
         }
     }
