@@ -14,10 +14,7 @@ namespace Nascar_Races_Client
         const float airDensity = 1.225f;
         const float frontSurface = 2.5f;
         const float carAirDynamic = 0.35f;
-        public float X { get; private set; } = 0;
-        public float Y { get; private set; } = 0;
-        public float Length { get; private set; }
-        public float Width { get; private set; }
+        
         private float _speed;
         public float Speed
         {
@@ -28,7 +25,6 @@ namespace Nascar_Races_Client
                 else _speed = value;
             }
         }
-        public float HeadingAngle { get; set; } = 0;
 
         //change to private for logs only
         public float _currentAcceleration { get; private set; }

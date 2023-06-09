@@ -32,7 +32,7 @@ namespace NASCAR_Races_Server
         private Thread _collisionCheckerThread;
         private Thread _tcpListenerThread;
         private bool _killCollisionChecker = false;
-        private static string _serverIP { get; } = "127.0.0.1";
+        private static string _serverIP { get; } = "192.168.0.100";
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
 
@@ -55,6 +55,7 @@ namespace NASCAR_Races_Server
             _turnCurveRadius = turnCurveRadius;
 
             _collisionCheckerThread = new(CheckCollisions);
+            
             _tcpListenerThread = new(AwaitForCars);
             _tcpListenerThread.Start();
 
@@ -67,14 +68,11 @@ namespace NASCAR_Races_Server
             return temp;
         }
 
-        private void CheckCollisions()
+        /*private void CheckCollisions()
         {
             //creating list of cars
             List<CarMapper>listOfCars = new List<CarMapper>();
-            foreach(var handler in ListOfCarHandlers)
-            {
-                listOfCars.Add(handler.GetCar());
-            }
+            ListOfCarHandlers.ForEach(handler => { listOfCars.Add(handler.GetCar()); });
             while (!_killCollisionChecker)
             {
                 foreach (CarMapper car1 in listOfCars)
@@ -89,8 +87,39 @@ namespace NASCAR_Races_Server
 
                         if (AreRectanglesColliding(car1, car2))
                         {
+                            int index = listOfCars.IndexOf(car1);
                             car1.IsDisposable = true;
                             car2.IsDisposable = true;
+                            Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
+                        }
+                    }
+                }
+            }
+        }*/
+        private void CheckCollisions()
+        {
+            while (!_killCollisionChecker)
+            {
+                Dictionary<CarMapper, ServerTCPHandler> handlerMap = new();
+                ListOfCarHandlers.ForEach(handler =>
+                {
+                    handlerMap[handler.GetCar()] = handler;
+                });
+                foreach (KeyValuePair<CarMapper, ServerTCPHandler> pair1 in handlerMap)
+                {
+                    var car1 = pair1.Key;
+                    if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
+                        continue;
+                    foreach(KeyValuePair<CarMapper, ServerTCPHandler> pair2 in handlerMap)
+                    {
+                        var car2 = pair2.Key;
+                        if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
+                            continue;
+
+                        if (AreRectanglesColliding(car1, car2))
+                        {
+                            handlerMap[car1].Kill();
+                            handlerMap[car2].Kill();
                             Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
                         }
                     }
@@ -168,7 +197,7 @@ namespace NASCAR_Races_Server
         {
             IsRaceStarted = true;
             ListOfCarHandlers.ForEach(handler => { handler.Start(); });
-            //_collisionCheckerThread.Start();
+            _collisionCheckerThread.Start();
         }
         public void KillThreads()
         {

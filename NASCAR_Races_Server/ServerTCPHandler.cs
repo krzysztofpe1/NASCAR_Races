@@ -142,7 +142,11 @@ namespace NASCAR_Races_Server
         }
         public void Start()
         {
-            SendingComm(startRaceSignal);
+            SendingComm(TCPSignals.startRaceSignal);
+        }
+        public void Kill()
+        {
+            SendingComm(TCPSignals.killCarSignal);
         }
     }
 }

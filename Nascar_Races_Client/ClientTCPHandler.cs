@@ -15,7 +15,7 @@ namespace Nascar_Races_Client
     {
         private const int _dataPort = 2000;
         private const int _commPort = 2001;
-        private const string _serverIP = "127.0.0.1";
+        private const string _serverIP = "192.168.0.100";
         private TcpClient _dataClient;
         private TcpClient _commClient;
         private NetworkStream _dataStream;
@@ -68,7 +68,7 @@ namespace Nascar_Races_Client
                 _receivingDataThread = new(ReceivingData);
                 _receivingDataThread.Start();
 
-                _commThread = new(ExchangeComm);
+                _commThread = new(ReceivingComm);
                 _commThread.Start();
             }
             else
@@ -80,7 +80,8 @@ namespace Nascar_Races_Client
         {
             List<DrawableCar> cars = new List<DrawableCar>
             {
-                MyCar.CreateMap()
+                
+                (DrawableCar)MyCar
             };
             cars.AddRange(Opponents);
 
@@ -131,11 +132,10 @@ namespace Nascar_Races_Client
                     lastBytesRead = bytesRead;
                     data.AddRange(buffer.Take(bytesRead));
                 }
-                byte[] dataRead = data.ToArray();
-                Opponents = Deserialize<List<CarMapper>>(dataRead);
+                Opponents = Deserialize<List<CarMapper>>(data.ToArray());
             }
         }
-        private void ExchangeComm()
+        private void ReceivingComm()
         {
             while (!IsDisposable)
             {

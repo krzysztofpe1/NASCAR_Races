@@ -19,6 +19,7 @@ namespace Nascar_Races_Client
         private Pen _penCircuit;
         private Pen _penPit;
         private Pen _penCar;
+        private Pen _myCarPen;
         private int _halfPaintBrushSize = 30;
         //Points of start and end of the straights
         public List<DrawableCar> listOfCars { get; set; }
@@ -35,6 +36,7 @@ namespace Nascar_Races_Client
             _penCircuit = new Pen(Color.Black, worldinformation.PenCircuitSize + 7);
             _penPit = new Pen(Color.Orange, worldinformation.PenCircuitSize / 2);
             _penCar = new Pen(Color.Red, worldinformation.PenCarSize);
+            _myCarPen = new Pen(Color.Green, worldinformation.PenCarSize);
             _x1 = _canvasWidth / 2 - _straightLength / 2;
             _x2 = _canvasWidth / 2 + _straightLength / 2;
             listOfCars = new();
@@ -78,7 +80,10 @@ namespace Nascar_Races_Client
                 g.TranslateTransform(car.X, car.Y);
                 g.RotateTransform(car.HeadingAngle);
                 g.TranslateTransform(-car.X, -car.Y);
-                g.DrawRectangle(_penCar, car.X - car.Length / 2, car.Y - car.Width / 2, car.Length, car.Width);
+                Pen carPen = _penCar;
+                if (car.GetType().Name == "Car") carPen = _myCarPen;
+                else carPen = _penCar;
+                g.DrawRectangle(carPen, car.X - car.Length / 2, car.Y - car.Width / 2, car.Length, car.Width);
                 g.ResetTransform();
             }
         }
