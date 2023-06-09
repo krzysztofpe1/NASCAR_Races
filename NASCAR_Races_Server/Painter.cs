@@ -63,10 +63,8 @@ namespace NASCAR_Races_Server
         {
             if (listOfCars.Count() == 0)
             {
-                Debug.WriteLine("Pusta lista");
                 return;
             }
-            Debug.WriteLine("lista niepusta");
             listOfCars.ForEach(car => { PaintCar(g, car); });
             //Console.Clear();
             //listOfCars.ForEach(car => { WriteLogs(car); });

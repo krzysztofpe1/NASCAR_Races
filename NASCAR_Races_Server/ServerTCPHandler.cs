@@ -20,10 +20,16 @@ namespace NASCAR_Races_Server
         private NetworkStream _commStream;
 
         private CarMapper _myCar;
-        private Thread _dataThread;
+        private Thread _ReceivingDataThread;
+        private Thread _SendingDataThread;
         private Thread _commThread;
         private BinaryFormatter _formatter;
-        private int _dataLength;
+        private DataContractSerializer _serializer;
+        private int _dataLength = 1024;
+
+        public bool IsDisposable = false;
+
+        public List<ServerTCPHandler> AllCarHandlers { get; set; }
         public ServerTCPHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
         {
             _dataClient = dataClient;
@@ -35,18 +41,22 @@ namespace NASCAR_Races_Server
             _myCar = new();
 
             _formatter = new();
+            _serializer = new(typeof(CarMapper));
             _dataLength = DefineBufferSizeForCarMapperRawData();
 
-            _dataThread = new(ExchangeData);
-            _dataThread.Start();
+            _ReceivingDataThread = new(ReceivingData);
+            _ReceivingDataThread.Start();
+
+            _SendingDataThread = new(SendingData);
+            _SendingDataThread.Start();
 
             _commThread = new(ExchangeComm);
             //_commThread.Start();
-            SendComm(myCarNumber);
+            SendingComm(myCarNumber);
         }
-        private void ExchangeData()
+        private void ReceivingData()
         {
-            while (true)
+            while (!IsDisposable)
             {
                 byte[] response = new byte[_dataLength];
                 int bytesRead = _dataStream.Read(response, 0, _dataLength);
@@ -54,14 +64,29 @@ namespace NASCAR_Races_Server
                 _myCar = temp;
             }
         }
+        private void SendingData()
+        {
+            while (!IsDisposable)
+            {
+                Thread.Sleep(50);
+                List<CarMapper> cars = new List<CarMapper>();
+                AllCarHandlers.ForEach(carHandler =>
+                { 
+                    if(carHandler != this)
+                        cars.Add(carHandler.GetCar()); 
+                });
+                byte[] dataToSend = Serialize(cars);
+                _dataStream.Write(dataToSend, 0, dataToSend.Length);
+            }
+        }
         private void ExchangeComm()
         {
-            while (true)
+            while (!IsDisposable)
             {
 
             }
         }
-        private void SendComm(int signal)
+        private void SendingComm(int signal)
         {
             using (var ms = new MemoryStream())
             {
@@ -70,12 +95,12 @@ namespace NASCAR_Races_Server
                 Debug.WriteLine(ms.ToArray().Length);
             }
         }
-        private byte[] SerializeCar()
+        private byte[] Serialize(object obj)
         {
+            if (obj == null) return null;
             using (MemoryStream stream = new())
             {
-                var formatter = new BinaryFormatter();
-                _formatter.Serialize(stream, _myCar);
+                _formatter.Serialize(stream, obj);
                 return stream.ToArray();
             }
         }
@@ -106,10 +131,9 @@ namespace NASCAR_Races_Server
         }
         private CarMapper DeserializeCar(byte[] response)
         {
-            using(MemoryStream memoryStream = new MemoryStream(response))
+            using (MemoryStream ms = new(response))
             {
-                var myobject = (CarMapper)_formatter.Deserialize(memoryStream);
-                return myobject;
+                return (CarMapper)_formatter.Deserialize(ms);
             }
         }
         public CarMapper GetCar()
@@ -118,7 +142,7 @@ namespace NASCAR_Races_Server
         }
         public void Start()
         {
-            SendComm(startRaceSignal);
+            SendingComm(startRaceSignal);
         }
     }
 }

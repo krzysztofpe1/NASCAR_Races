@@ -112,7 +112,7 @@ namespace NASCAR_Races_Server
                 Debug.WriteLine("Connected");
                 var temp = new ServerTCPHandler(dataClient, commClient, _nextCarNumber++);
                 ListOfCarHandlers.Add(temp);
-                Thread.Sleep(1000);
+                temp.AllCarHandlers = ListOfCarHandlers;
                 if(IsRaceStarted)
                 {
                     temp.Start();

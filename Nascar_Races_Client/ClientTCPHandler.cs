@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace Nascar_Races_Client
         private TcpClient _commClient;
         private NetworkStream _dataStream;
         private NetworkStream _commStream;
-        private Thread _dataThread;
+        private Thread _sendingDataThread;
+        private Thread _receivingDataThread;
         private Thread _commThread;
         public bool IsDisposable { get; private set; } = false;
         private BinaryFormatter _binaryFormatter;
+        private DataContractSerializer _serializer;
         public Car MyCar { get; private set; }
-        private List<CarMapper> _opponents { get; set; }
+        public List<CarMapper> Opponents { get; private set; }
         public Thread CarThread { get; private set; }
 
         private Point _startingPos = new Point();
@@ -34,8 +37,9 @@ namespace Nascar_Races_Client
         public ClientTCPHandler(WorldInformation worldInf)
         {
             _binaryFormatter = new BinaryFormatter();
+            _serializer = new(typeof(CarMapper));
 
-            _opponents = new();
+            Opponents = new();
             if (Connect())
             {
                 byte[] comm = new byte[54];
@@ -55,11 +59,15 @@ namespace Nascar_Races_Client
                     MyCar = new(_startingPos, _pitPos, 1000, deserialized.ToString(), 30000, worldInf);
                     CarThread = new(MyCar.Move);
                 }
-                Debug.Write(" TUTAJ WESZŁO");
                 CarThread = new(MyCar.Move);
                 CarThread.Start();
-                _dataThread = new(ExchangeData);
-                _dataThread.Start();
+
+                _sendingDataThread = new(SendingData);
+                _sendingDataThread.Start();
+
+                _receivingDataThread = new(ReceivingData);
+                _receivingDataThread.Start();
+
                 _commThread = new(ExchangeComm);
                 _commThread.Start();
             }
@@ -74,7 +82,7 @@ namespace Nascar_Races_Client
             {
                 MyCar.CreateMap()
             };
-            cars.AddRange(_opponents);
+            cars.AddRange(Opponents);
 
             return cars;
         }
@@ -95,15 +103,36 @@ namespace Nascar_Races_Client
             }
             return true;
         }
-        private void ExchangeData()
+        private void SendingData()
         {
             while (!IsDisposable)
             {
                 //sending my object to server every iteration
                 var myObjectSerialized = SerializeCar();
                 _dataStream.Write(myObjectSerialized, 0, myObjectSerialized.Length);
-                Debug.WriteLine(myObjectSerialized.Length);
 
+            }
+        }
+        private async void ReceivingData()
+        {
+            while (!IsDisposable)
+            {
+                byte[] buffer = new byte[256];
+                List<byte> data = new List<byte>();
+                int lastBytesRead = 0;
+                while (true)
+                {
+                    int bytesRead = _dataStream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead < lastBytesRead)
+                    {
+                        if (bytesRead != 0) data.AddRange(buffer.Take(bytesRead));
+                        break;
+                    }
+                    lastBytesRead = bytesRead;
+                    data.AddRange(buffer.Take(bytesRead));
+                }
+                byte[] dataRead = data.ToArray();
+                Opponents = Deserialize<List<CarMapper>>(dataRead);
             }
         }
         private void ExchangeComm()
@@ -116,7 +145,7 @@ namespace Nascar_Races_Client
                 {
                     var formatter = new BinaryFormatter();
                     int deserialized = (int)formatter.Deserialize(ms);
-                    switch(deserialized)
+                    switch (deserialized)
                     {
                         case TCPSignals.startRaceSignal:
                             MyCar.Started = true;
@@ -140,12 +169,16 @@ namespace Nascar_Races_Client
         }
         private byte[] SerializeCar()
         {
-            using (MemoryStream stream = new())
+            MemoryStream ms = new();
+            _binaryFormatter.Serialize(ms, MyCar.CreateMap());
+            return ms.ToArray();
+        }
+        private T Deserialize<T>(byte[] data)
+        {
+            if (data == null) return default(T);
+            using (MemoryStream ms = new(data))
             {
-                var formatter = new BinaryFormatter();
-                CarMapper map = MyCar.CreateMap();
-                _binaryFormatter.Serialize(stream, map);
-                return stream.ToArray();
+                return (T)_binaryFormatter.Deserialize(ms);
             }
         }
 
