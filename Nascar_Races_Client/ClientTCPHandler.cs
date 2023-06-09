@@ -111,7 +111,6 @@ namespace Nascar_Races_Client
                 //sending my object to server every iteration
                 var myObjectSerialized = SerializeCar();
                 _dataStream.Write(myObjectSerialized, 0, myObjectSerialized.Length);
-
             }
         }
         private async void ReceivingData()
@@ -133,6 +132,7 @@ namespace Nascar_Races_Client
                     data.AddRange(buffer.Take(bytesRead));
                 }
                 Opponents = Deserialize<List<CarMapper>>(data.ToArray());
+                MyCar.NeighbouringCars = Opponents;
             }
         }
         private void ReceivingComm()

@@ -43,7 +43,7 @@ namespace Nascar_Races_Client
         public float MaxHorsePower { get; set; }
         public float CurrentHorsePower { get; set; }
 
-        protected List<Car> _neighbouringCars { get; set; }
+        public List<CarMapper> NeighbouringCars { get; set; }
 
         protected bool _recalculateHeadingAngle { get; set; } = true;
 
@@ -381,7 +381,7 @@ namespace Nascar_Races_Client
         protected float DistanceToOpponentOnRight()
         {
             float distance = _worldInf.DistanceToEdgeOfTrack(this);
-            foreach (Car car in _neighbouringCars)
+            foreach (CarMapper car in NeighbouringCars)
             {
                 if (Math.Abs(X - car.X) > Length + car.Length / 2) continue;
                 float temp;
@@ -424,7 +424,7 @@ namespace Nascar_Races_Client
         protected float DistanceToOpponentOnLeft()
         {
             float distance = _worldInf.DistanceToEdgeOfTrack(this, false);
-            foreach (Car car in _neighbouringCars)
+            foreach (CarMapper car in NeighbouringCars)
             {
                 if (Math.Abs(X - car.X) > Length + car.Length / 2) continue;
                 float temp;
@@ -464,8 +464,8 @@ namespace Nascar_Races_Client
         protected (float, float, float) DistanceToSpeedAndHPOfOpponentInFront()
         {
             float distance = float.MaxValue;
-            Car tempCar = null;
-            foreach (Car car in _neighbouringCars)
+            CarMapper tempCar = null;
+            foreach (CarMapper car in NeighbouringCars)
             {
                 int temp;
                 switch (WhatPartOfCircuitIsCarOn())

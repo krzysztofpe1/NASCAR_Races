@@ -34,7 +34,6 @@ namespace Nascar_Races_Client
         {
             _rightCircle = new Point(int.MaxValue, int.MaxValue);
             _leftCircle = new Point(0, 0);
-            _neighbouringCars = new List<Car>();
             int counter = 0;
             while (!IsDisposable)
             {
@@ -49,7 +48,6 @@ namespace Nascar_Races_Client
                 {
                     counter = 0;
                     var partOfCircuit = WhatPartOfCircuitIsCarOn();
-                    _neighbouringCars = _worldInfo.NearbyCars(this);
                     int distanceToOpponentOnLeft = (int)DistanceToOpponentOnLeft();
                     switch (partOfCircuit)
                     {
@@ -61,12 +59,12 @@ namespace Nascar_Races_Client
                             break;
                         case WorldInformation.CIRCUIT_PARTS.TOP:
                             //Car will enter "left" turn
-                            if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, false);
+                            if (NeighbouringCars.Count > 0) FindSafeCircle((int)Y, false);
                             else FindCircle((int)Y, false);
                             break;
                         case WorldInformation.CIRCUIT_PARTS.BOTTOM:
                             //Car will enter "right" turn
-                            if (_neighbouringCars.Count > 0) FindSafeCircle((int)Y, true);
+                            if (NeighbouringCars.Count > 0) FindSafeCircle((int)Y, true);
                             else FindCircle((int)Y, true);
                             break;
                         case WorldInformation.CIRCUIT_PARTS.PIT:
