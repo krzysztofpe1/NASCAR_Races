@@ -70,34 +70,7 @@ namespace NASCAR_Races_Server
             return temp;
         }
 
-        /*private void CheckCollisions()
-        {
-            //creating list of cars
-            List<CarMapper>listOfCars = new List<CarMapper>();
-            ListOfCarHandlers.ForEach(handler => { listOfCars.Add(handler.GetCar()); });
-            while (!_killCollisionChecker)
-            {
-                foreach (CarMapper car1 in listOfCars)
-                {
-                    if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
-                        continue;
 
-                    foreach (CarMapper car2 in listOfCars)
-                    {
-                        if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
-                            continue;
-
-                        if (AreRectanglesColliding(car1, car2))
-                        {
-                            int index = listOfCars.IndexOf(car1);
-                            car1.IsDisposable = true;
-                            car2.IsDisposable = true;
-                            Debug.WriteLine("Zabito: " + car1.CarName + ", " + car2.CarName);
-                        }
-                    }
-                }
-            }
-        }*/
         private void CheckCollisions()
         {
             while (!_killCollisionChecker)
@@ -118,7 +91,7 @@ namespace NASCAR_Races_Server
                         if (car1 == car2 || car1.IsDisposable || car2.IsDisposable)
                             continue;
 
-                        if (AreRectanglesColliding(car1, car2))
+                        if (AreCarsColliding(car1, car2))
                         {
                             handlerMap[car1].Kill();
                             handlerMap[car2].Kill();
@@ -206,19 +179,19 @@ namespace NASCAR_Races_Server
         private bool AreCarsColliding(CarMapper car1, CarMapper car2)
         {
             // A---------B
-            // |         |
-            // |         |
+            // |         |--->
+            // |         |--->
             // C---------D
             double rotationAngleCar1 = Math.Abs(car1.HeadingAngle);
 
             //Console.WriteLine(rotationAngleCar1);
             //Debug.WriteLine(rotationAngleCar1);
-            
+
             (double, double) car1A = (car1.X - car1.Length / 2, car1.Y - car1.Width / 2);
             (double, double) car1B = (car1.X + car1.Length / 2, car1.Y - car1.Width / 2);
             (double, double) car1C = (car1.X - car1.Length / 2, car1.Y + car1.Width / 2);
             (double, double) car1D = (car1.X + car1.Length / 2, car1.Y + car1.Width / 2);
- 
+
             car1A = rotateCar(car1A.Item1, car1A.Item2, rotationAngleCar1, car1.X, car1.Y);
             car1B = rotateCar(car1B.Item1, car1B.Item2, rotationAngleCar1, car1.X, car1.Y);
             car1C = rotateCar(car1C.Item1, car1C.Item2, rotationAngleCar1, car1.X, car1.Y);
@@ -240,32 +213,48 @@ namespace NASCAR_Races_Server
             List<(double, double)> car1Points = new List<(double, double)> { car1A, car1B, car1C, car1D };
             List<(double, double)> car2Points = new List<(double, double)> { car2A, car2B, car2C, car2D };
 
-            return true;
-            // Check all axes of both cars
-
-
-            /*
-            for (int i = 0; i < 4; i++)
+            double a1 = 0;
+            double b1 = 0;
+            double a2 = 0;
+            double b2 = 0;
+            if (car1A.Item1 != car1B.Item1)
             {
-                (double, double) axis1 = (car1Points[i].Item1 - car1Points[(i + 1) % 4].Item1, car1Points[i].Item2 - car1Points[(i + 1) % 4].Item2);
-                if (IsSeparatingAxis(car1Points, car2Points, axis1))
-                    return false; // There is a separating axis, cars are not colliding
+                a1 = (car1A.Item2 - car1B.Item2) / (car1A.Item1 - car1B.Item1);
+                b1 = (car1A.Item2 - a1 * car1A.Item1);
+                if (rotationAngleCar1 < 90 || rotationAngleCar1 > 270)
+                    b1 += car1.Width / 2;
+                else
+                    b1 -= car1.Width / 2;
 
-                (double, double) axis2 = (car2Points[i].Item1 - car2Points[(i + 1) % 4].Item1, car2Points[i].Item2 - car2Points[(i + 1) % 4].Item2);
-                if (IsSeparatingAxis(car1Points, car2Points, axis2))
-                    return false; // There is a separating axis, cars are not colliding
+                a2 = -1 / a1;
+                b2 = car1.Y - a1 * car1.X;
+
+                if (a1 == 0)
+                {
+                    foreach ((double, double) point in car2Points)
+                    {
+                        double distance1 = Math.Abs(point.Item1 - car1.X);
+                        double distance2 = Math.Abs(point.Item2 - car1.Y);
+                        if (distance2 <= car1.Width / 2 && distance1 <= car1.Length / 2)
+                            return true;
+                    }
+                }
+                else
+                {
+                    foreach ((double, double) point in car2Points)
+                    {
+                        // obliczy odległość od prostej
+                        double distance1 = Math.Abs(point.Item1 * a1 + point.Item2 * (-1) + b1) / Math.Sqrt(a1 * a1 + 1);
+                        double distance2 = Math.Abs(point.Item1 * a2 + point.Item2 * (-1) + b2) / Math.Sqrt(a2 * a2 + 1);
+                        if (distance2 <= car1.Width / 2 && distance1 <= car1.Length / 2)
+                            return true;
+                    }
+                }
+
             }
-            Debug.WriteLine("Samochod1 Ax " + car1A.Item1 + " Ay " + car1A.Item2 +
-                " Bx " + car1B.Item1 + " By " + car1B.Item2 +
-                " Cx " + car1C.Item1 + " Cy " + car1C.Item2 +
-                " Dx " + car1D.Item1 + " Dy " + car1D.Item2);
 
-            Debug.WriteLine("Samochod2 Ax " + car2A.Item1 + " Ay " + car2A.Item2 +
-                            " Bx " + car2B.Item1 + " By " + car2B.Item2 +
-                            " Cx " + car2C.Item1 + " Cy " + car2C.Item2 +
-                            " Dx " + car2D.Item1 + " Dy " + car2D.Item2);
-            return true; // No separating axis found, cars are colliding
-            */
+
+            return false;
         }
         private Point NextStartingPoint()
         {
