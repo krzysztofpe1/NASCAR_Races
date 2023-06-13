@@ -84,6 +84,7 @@ namespace Nascar_Races_Client
         // Run in the loop
         public void RunPhysic()
         {
+            //Console.WriteLine(HeadingAngle);
             DateTime currentTime = DateTime.Now;
             TimeSpan timeSinceLastExecution = currentTime - _lastExecutionTime;
             _lastExecutionTime = currentTime;
@@ -154,7 +155,7 @@ namespace Nascar_Races_Client
                     }
                     else CurrentHorsePower = MaxHorsePower;
                     X -= Speed * timeElapsed;
-                    HeadingAngle = 0;
+                    HeadingAngle = 180;
                     return;
                 }
                 // if car in front is slower then go to the left
@@ -176,7 +177,7 @@ namespace Nascar_Races_Client
                 }
                 else Debug.WriteLine("Out of context");
                 X -= Speed * timeElapsed;
-                HeadingAngle = 0;
+                HeadingAngle = 180;
 
             }
             else if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.BOTTOM)
@@ -200,13 +201,13 @@ namespace Nascar_Races_Client
                     Y += 0.25f;
                 }
                 X += Speed * timeElapsed;
-                HeadingAngle = 180;
+                HeadingAngle = 0;
             }
             else if (partOfCircuit == WorldInformation.CIRCUIT_PARTS.PIT)
             {
                 float Xtemp = X;
                 float Ytemp = Y;
-                HeadingAngle = 180;
+                HeadingAngle = 0;
                 //timeElapsed = 0.01f;
                 int bottomBorderPit = _worldInf.PitPosY + _worldInf.PenCircuitSize / 4 - (int)Length / 2;
                 if (Y < bottomBorderPit && _pitPos.X - 100 > X)

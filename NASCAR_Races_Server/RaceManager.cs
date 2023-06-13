@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
+using System.Reflection.Metadata;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace NASCAR_Races_Server
 {
@@ -32,7 +34,7 @@ namespace NASCAR_Races_Server
         private Thread _collisionCheckerThread;
         private Thread _tcpListenerThread;
         private bool _killCollisionChecker = false;
-        private static string _serverIP { get; } = "192.168.0.100";
+        private static string _serverIP { get; } = "127.0.0.1";
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
 
@@ -124,6 +126,7 @@ namespace NASCAR_Races_Server
                         }
                     }
                 }
+
             }
         }
 
@@ -178,6 +181,91 @@ namespace NASCAR_Races_Server
                 return false;
 
             return true;
+        }
+        private (double, double) rotateCar(double X, double Y, double Angle, double centerX, double centerY)
+        {
+            Angle = Angle * Math.PI / 180;
+            double newX = centerX + (X - centerX ) * Math.Cos(Angle) - (Y - centerY) * Math.Sin(Angle);
+            double newY = centerY + (X - centerX ) * Math.Sin(Angle) + (Y - centerY) * Math.Cos(Angle);
+            return (newX, newY);
+        }
+
+        private bool IsSeparatingAxis(List<(double, double)> car1Points, List<(double, double)> car2Points, (double, double) axis)
+        {
+            // Project points onto axis
+            List<double> car1Projections = car1Points.Select(point => point.Item1 * axis.Item1 + point.Item2 * axis.Item2).ToList();
+            List<double> car2Projections = car2Points.Select(point => point.Item1 * axis.Item1 + point.Item2 * axis.Item2).ToList();
+
+            // Check for overlap
+            if (car1Projections.Max() < car2Projections.Min() || car2Projections.Max() < car1Projections.Min())
+                return true; // There is no overlap along this axis, it's a separating axis
+
+            return false;
+        }
+        // 
+        private bool AreCarsColliding(CarMapper car1, CarMapper car2)
+        {
+            // A---------B
+            // |         |
+            // |         |
+            // C---------D
+            double rotationAngleCar1 = Math.Abs(car1.HeadingAngle);
+
+            //Console.WriteLine(rotationAngleCar1);
+            //Debug.WriteLine(rotationAngleCar1);
+            
+            (double, double) car1A = (car1.X - car1.Length / 2, car1.Y - car1.Width / 2);
+            (double, double) car1B = (car1.X + car1.Length / 2, car1.Y - car1.Width / 2);
+            (double, double) car1C = (car1.X - car1.Length / 2, car1.Y + car1.Width / 2);
+            (double, double) car1D = (car1.X + car1.Length / 2, car1.Y + car1.Width / 2);
+ 
+            car1A = rotateCar(car1A.Item1, car1A.Item2, rotationAngleCar1, car1.X, car1.Y);
+            car1B = rotateCar(car1B.Item1, car1B.Item2, rotationAngleCar1, car1.X, car1.Y);
+            car1C = rotateCar(car1C.Item1, car1C.Item2, rotationAngleCar1, car1.X, car1.Y);
+            car1D = rotateCar(car1D.Item1, car1D.Item2, rotationAngleCar1, car1.X, car1.Y);
+
+            double rotationAngleCar2 = car1.HeadingAngle;
+
+            (double, double) car2A = (car2.X - car2.Length / 2, car2.Y - car2.Width / 2);
+            (double, double) car2B = (car2.X + car2.Length / 2, car2.Y - car2.Width / 2);
+            (double, double) car2C = (car2.X - car2.Length / 2, car2.Y + car2.Width / 2);
+            (double, double) car2D = (car2.X + car2.Length / 2, car2.Y + car2.Width / 2);
+
+            car2A = rotateCar(car2A.Item1, car2A.Item2, rotationAngleCar2, car2.X, car2.Y);
+            car2B = rotateCar(car2B.Item1, car2B.Item2, rotationAngleCar2, car2.X, car2.Y);
+            car2C = rotateCar(car2C.Item1, car2C.Item2, rotationAngleCar2, car2.X, car2.Y);
+            car2D = rotateCar(car2D.Item1, car2D.Item2, rotationAngleCar2, car2.X, car2.Y);
+
+            // Corners of both cars
+            List<(double, double)> car1Points = new List<(double, double)> { car1A, car1B, car1C, car1D };
+            List<(double, double)> car2Points = new List<(double, double)> { car2A, car2B, car2C, car2D };
+
+            return true;
+            // Check all axes of both cars
+
+
+            /*
+            for (int i = 0; i < 4; i++)
+            {
+                (double, double) axis1 = (car1Points[i].Item1 - car1Points[(i + 1) % 4].Item1, car1Points[i].Item2 - car1Points[(i + 1) % 4].Item2);
+                if (IsSeparatingAxis(car1Points, car2Points, axis1))
+                    return false; // There is a separating axis, cars are not colliding
+
+                (double, double) axis2 = (car2Points[i].Item1 - car2Points[(i + 1) % 4].Item1, car2Points[i].Item2 - car2Points[(i + 1) % 4].Item2);
+                if (IsSeparatingAxis(car1Points, car2Points, axis2))
+                    return false; // There is a separating axis, cars are not colliding
+            }
+            Debug.WriteLine("Samochod1 Ax " + car1A.Item1 + " Ay " + car1A.Item2 +
+                " Bx " + car1B.Item1 + " By " + car1B.Item2 +
+                " Cx " + car1C.Item1 + " Cy " + car1C.Item2 +
+                " Dx " + car1D.Item1 + " Dy " + car1D.Item2);
+
+            Debug.WriteLine("Samochod2 Ax " + car2A.Item1 + " Ay " + car2A.Item2 +
+                            " Bx " + car2B.Item1 + " By " + car2B.Item2 +
+                            " Cx " + car2C.Item1 + " Cy " + car2C.Item2 +
+                            " Dx " + car2D.Item1 + " Dy " + car2D.Item2);
+            return true; // No separating axis found, cars are colliding
+            */
         }
         private Point NextStartingPoint()
         {
