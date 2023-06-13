@@ -29,6 +29,8 @@ namespace NASCAR_Races_Server
 
         public bool IsDisposable = false;
 
+        private bool _clientReadyForNextData = true;
+
         public List<ServerTCPHandler> AllCarHandlers { get; set; }
         public ServerTCPHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
         {
@@ -50,8 +52,8 @@ namespace NASCAR_Races_Server
             _SendingDataThread = new(SendingData);
             _SendingDataThread.Start();
 
-            _commThread = new(ExchangeComm);
-            //_commThread.Start();
+            _commThread = new(ReceivingComm);
+            _commThread.Start();
             SendingComm(myCarNumber);
         }
         private void ReceivingData()
@@ -62,38 +64,42 @@ namespace NASCAR_Races_Server
                 int bytesRead = _dataStream.Read(response, 0, _dataLength);
                 var temp = DeserializeCar(response);
                 _myCar = temp;
+                SendingComm(TCPSignals.serverReadyForData);
             }
         }
         private void SendingData()
         {
             while (!IsDisposable)
             {
+                if (!_clientReadyForNextData) continue;
                 Thread.Sleep(50);
                 List<CarMapper> cars = new List<CarMapper>();
                 AllCarHandlers.ForEach(carHandler =>
-                { 
-                    if(carHandler != this)
-                        cars.Add(carHandler.GetCar()); 
+                {
+                    if (carHandler != this)
+                        cars.Add(carHandler.GetCar());
                 });
                 byte[] dataToSend = Serialize(cars);
                 _dataStream.Write(dataToSend, 0, dataToSend.Length);
             }
         }
-        private void ExchangeComm()
+        private void ReceivingComm()
         {
             while (!IsDisposable)
             {
-
+                int response = _commStream.ReadByte();
+                switch (response)
+                {
+                    case TCPSignals.clientReadyForData:
+                        _clientReadyForNextData = true;
+                        break;
+                    default: break;
+                }
             }
         }
         private void SendingComm(int signal)
         {
-            using (var ms = new MemoryStream())
-            {
-                _formatter.Serialize(ms, signal);
-                _commStream.Write(ms.ToArray());
-                Debug.WriteLine(ms.ToArray().Length);
-            }
+            _commStream.WriteByte((byte)signal);
         }
         private byte[] Serialize(object obj)
         {

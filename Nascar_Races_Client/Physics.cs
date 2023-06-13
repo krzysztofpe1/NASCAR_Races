@@ -63,8 +63,6 @@ namespace Nascar_Races_Client
 
         public STATE State { get; protected set; } = STATE.ON_CIRCUIT;
 
-        public Physics() { }
-
         public Physics(float x, float y, float mass, float frictionofweels, float maxHorsePower, WorldInformation worldInfo)
         {
             X = x;
@@ -175,7 +173,6 @@ namespace Nascar_Races_Client
                     //notBraking();
                     Y -= 0.25f;
                 }
-                else Debug.WriteLine("Out of context");
                 X -= Speed * timeElapsed;
                 HeadingAngle = 180;
 
