@@ -55,8 +55,8 @@ namespace Nascar_Races_Client
             _nextPitPos.Y = pitPosY - penCircuitSize / 4 + WorldInformation.CarWidth / 2;
             WorldInformation.CarWidthOfPittingManouver = pitPosY - _nextPitPos.Y;
             _nextPitPos.X = WorldInformation.x2 - WorldInformation.CarLength;
-            _client = new ClientTCPHandler(WorldInformation);
             _carLength = WorldInformation.CarLength;
+            _client = new ClientTCPHandler(WorldInformation);
         }
         public List<DrawableCar> getCars()
         {
