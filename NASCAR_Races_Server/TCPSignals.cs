@@ -11,5 +11,7 @@ namespace NASCAR_Races_Server
         public const int startRaceSignal = 420;
         public const int killCarSignal = 421;
         public const int endRaceSignal = 422;
+        public const int serverReadyForData = 423;
+        public const int clientReadyForData = 424;
     }
 }

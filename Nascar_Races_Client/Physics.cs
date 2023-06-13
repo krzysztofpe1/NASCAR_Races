@@ -174,7 +174,6 @@ namespace Nascar_Races_Client
                     //notBraking();
                     Y -= 0.25f;
                 }
-                else Debug.WriteLine("Out of context");
                 X -= Speed * timeElapsed;
                 HeadingAngle = 0;
 

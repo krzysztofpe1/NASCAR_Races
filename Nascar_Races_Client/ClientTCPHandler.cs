@@ -34,6 +34,8 @@ namespace Nascar_Races_Client
         private Point _pitPos = new Point();
         private WorldInformation _worldInformation;
         private int _carNumber;
+
+        private bool _serverReadyForNextData = true;
         public ClientTCPHandler(WorldInformation worldInf)
         {
             _binaryFormatter = new BinaryFormatter();
@@ -80,7 +82,6 @@ namespace Nascar_Races_Client
         {
             List<DrawableCar> cars = new List<DrawableCar>
             {
-                
                 (DrawableCar)MyCar
             };
             cars.AddRange(Opponents);
@@ -109,6 +110,9 @@ namespace Nascar_Races_Client
             while (!IsDisposable)
             {
                 //sending my object to server every iteration
+                Thread.Sleep(10);
+                if (!_serverReadyForNextData) continue;
+                _serverReadyForNextData = false;
                 var myObjectSerialized = SerializeCar();
                 _dataStream.Write(myObjectSerialized, 0, myObjectSerialized.Length);
             }
@@ -133,6 +137,7 @@ namespace Nascar_Races_Client
                 }
                 Opponents = Deserialize<List<CarMapper>>(data.ToArray());
                 MyCar.NeighbouringCars = Opponents;
+                SendComm(TCPSignals.clientReadyForData);
             }
         }
         private void ReceivingComm()
@@ -156,9 +161,20 @@ namespace Nascar_Races_Client
                         case TCPSignals.killCarSignal:
                             MyCar.IsDisposable = true;
                             break;
+                        case TCPSignals.serverReadyForData:
+                            _serverReadyForNextData = true;
+                            break;
                         default: break;
                     }
                 }
+            }
+        }
+        private void SendComm(int signal)
+        {
+            using (var ms = new MemoryStream())
+            {
+                _binaryFormatter.Serialize(ms, signal);
+                _commStream.Write(ms.ToArray());
             }
         }
         private void RestartCar()
