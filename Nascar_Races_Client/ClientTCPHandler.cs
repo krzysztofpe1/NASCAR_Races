@@ -44,23 +44,17 @@ namespace Nascar_Races_Client
             Opponents = new();
             if (Connect())
             {
-                byte[] comm = new byte[54];
-                _commStream.Read(comm);
-                using (var ms = new MemoryStream(comm))
+                int response = _commStream.ReadByte();
+                if (response < 0) { }
+                _worldInformation = worldInf;
+                _carNumber = response;
+                int temp = 0;
+                while (temp++ < response)
                 {
-                    var formatter = new BinaryFormatter();
-                    int deserialized = (int)formatter.Deserialize(ms);
-                    _worldInformation = worldInf;
-                    _carNumber = deserialized;
-                    int temp = 0;
-                    while (temp++ < deserialized)
-                    {
-                        _startingPos = RaceManager.NextStartingPoint();
-                        _pitPos = RaceManager.NextPitPoint();
-                    }
-                    MyCar = new(_startingPos, _pitPos, 1000, deserialized.ToString(), 30000, worldInf);
-                    CarThread = new(MyCar.Move);
+                    _startingPos = RaceManager.NextStartingPoint();
+                    _pitPos = RaceManager.NextPitPoint();
                 }
+                MyCar = new(_startingPos, _pitPos, 1000, response.ToString(), 30000, worldInf);
                 CarThread = new(MyCar.Move);
                 CarThread.Start();
 
@@ -144,38 +138,29 @@ namespace Nascar_Races_Client
         {
             while (!IsDisposable)
             {
-                byte[] comm = new byte[54];
-                _commStream.Read(comm);
-                using (var ms = new MemoryStream(comm))
+                int response = _commStream.ReadByte();
+                if (response < 0) continue;
+                switch (response)
                 {
-                    var formatter = new BinaryFormatter();
-                    int deserialized = (int)formatter.Deserialize(ms);
-                    switch (deserialized)
-                    {
-                        case TCPSignals.startRaceSignal:
-                            MyCar.Started = true;
-                            break;
-                        case TCPSignals.endRaceSignal:
-                            RestartCar();
-                            break;
-                        case TCPSignals.killCarSignal:
-                            MyCar.IsDisposable = true;
-                            break;
-                        case TCPSignals.serverReadyForData:
-                            _serverReadyForNextData = true;
-                            break;
-                        default: break;
-                    }
+                    case TCPSignals.startRaceSignal:
+                        MyCar.Started = true;
+                        break;
+                    case TCPSignals.endRaceSignal:
+                        RestartCar();
+                        break;
+                    case TCPSignals.killCarSignal:
+                        MyCar.IsDisposable = true;
+                        break;
+                    case TCPSignals.serverReadyForData:
+                        _serverReadyForNextData = true;
+                        break;
+                    default: break;
                 }
             }
         }
         private void SendComm(int signal)
         {
-            using (var ms = new MemoryStream())
-            {
-                _binaryFormatter.Serialize(ms, signal);
-                _commStream.Write(ms.ToArray());
-            }
+            _commStream.WriteByte((byte)signal);
         }
         private void RestartCar()
         {

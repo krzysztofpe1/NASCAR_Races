@@ -29,7 +29,7 @@ namespace NASCAR_Races_Server
 
         public bool IsDisposable = false;
 
-        private bool _clientReadyForNextData=true;
+        private bool _clientReadyForNextData = true;
 
         public List<ServerTCPHandler> AllCarHandlers { get; set; }
         public ServerTCPHandler(TcpClient dataClient, TcpClient commClient, int myCarNumber)
@@ -75,9 +75,9 @@ namespace NASCAR_Races_Server
                 Thread.Sleep(50);
                 List<CarMapper> cars = new List<CarMapper>();
                 AllCarHandlers.ForEach(carHandler =>
-                { 
-                    if(carHandler != this)
-                        cars.Add(carHandler.GetCar()); 
+                {
+                    if (carHandler != this)
+                        cars.Add(carHandler.GetCar());
                 });
                 byte[] dataToSend = Serialize(cars);
                 _dataStream.Write(dataToSend, 0, dataToSend.Length);
@@ -87,29 +87,19 @@ namespace NASCAR_Races_Server
         {
             while (!IsDisposable)
             {
-                byte[] comm = new byte[54];
-                _commStream.Read(comm);
-                using (var ms = new MemoryStream(comm))
+                int response = _commStream.ReadByte();
+                switch (response)
                 {
-                    var formatter = new BinaryFormatter();
-                    int deserialized = (int)formatter.Deserialize(ms);
-                    switch (deserialized)
-                    {
-                        case TCPSignals.clientReadyForData:
-                            _clientReadyForNextData = true;
-                            break;
-                        default: break;
-                    }
+                    case TCPSignals.clientReadyForData:
+                        _clientReadyForNextData = true;
+                        break;
+                    default: break;
                 }
             }
         }
         private void SendingComm(int signal)
         {
-            using (var ms = new MemoryStream())
-            {
-                _formatter.Serialize(ms, signal);
-                _commStream.Write(ms.ToArray());
-            }
+            _commStream.WriteByte((byte)signal);
         }
         private byte[] Serialize(object obj)
         {

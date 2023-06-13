@@ -17,12 +17,6 @@ namespace Nascar_Races_Client
         public string CarName { get; private set; }
 
         private WorldInformation _worldInfo;
-        public Car() { }
-        public Car(float x, float y, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(x, y, weight, 0.3f, maxHorsePower, worldInfo)
-        {
-            CarName = carName;
-            _worldInfo = worldInfo;
-        }
         public Car(Point startingPos, Point pitPos, float weight, string carName, float maxHorsePower, WorldInformation worldInfo) : base(startingPos.X, startingPos.Y, weight, 0.3f, maxHorsePower, worldInfo)
         {
             CarName = carName;
