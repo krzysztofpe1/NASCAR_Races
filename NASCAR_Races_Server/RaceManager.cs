@@ -83,8 +83,10 @@ namespace NASCAR_Races_Server
                 foreach (KeyValuePair<CarMapper, ServerTCPHandler> pair1 in handlerMap)
                 {
                     var car1 = pair1.Key;
+                    /*
                     if (car1.State != CarMapper.STATE.ON_CIRCUIT && car1.State != CarMapper.STATE.ON_WAY_TO_PIT_STOP)
                         continue;
+                    */
                     foreach(KeyValuePair<CarMapper, ServerTCPHandler> pair2 in handlerMap)
                     {
                         var car2 = pair2.Key;
@@ -227,7 +229,11 @@ namespace NASCAR_Races_Server
                     b1 -= car1.Width / 2;
 
                 a2 = -1 / a1;
-                b2 = car1.Y - a1 * car1.X;
+                b2 = car1.Y - a2 * car1.X;
+
+                // y = ax +b
+                // b = y - ax
+                //Debug.WriteLine(a1);
 
                 if (a1 == 0)
                 {
@@ -235,6 +241,7 @@ namespace NASCAR_Races_Server
                     {
                         double distance1 = Math.Abs(point.Item1 - car1.X);
                         double distance2 = Math.Abs(point.Item2 - car1.Y);
+
                         if (distance2 <= car1.Width / 2 && distance1 <= car1.Length / 2)
                             return true;
                     }
@@ -246,6 +253,10 @@ namespace NASCAR_Races_Server
                         // obliczy odległość od prostej
                         double distance1 = Math.Abs(point.Item1 * a1 + point.Item2 * (-1) + b1) / Math.Sqrt(a1 * a1 + 1);
                         double distance2 = Math.Abs(point.Item1 * a2 + point.Item2 * (-1) + b2) / Math.Sqrt(a2 * a2 + 1);
+                        //if (distance2 > 500)
+                            //Debug.WriteLine("Dupa");
+                        //Console.WriteLine("Distance 1: " + distance1 + " " + distance2);
+                        //Debug.WriteLine("Distance 1: " + distance1 + " " + distance2);
                         if (distance2 <= car1.Width / 2 && distance1 <= car1.Length / 2)
                             return true;
                     }

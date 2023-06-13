@@ -106,6 +106,7 @@ namespace Nascar_Races_Client
             }
             else
             {
+                //Debug.WriteLine(partOfCircuit);
                 MoveCarOnStraight((float)timeSinceLastExecution.TotalSeconds, partOfCircuit);
                 _recalculateHeadingAngle = true;
             }
@@ -211,7 +212,7 @@ namespace Nascar_Races_Client
                 {
                     Y += 0.25f;
                 }
-                if (Speed > _worldInf.CarMaxSpeedInPit)
+                if ((Speed > _worldInf.CarMaxSpeedInPit) && (X < _pitPos.X))
                 {
                     CurrentHorsePower = 0;
                     Speed -= 0.5f;
@@ -259,7 +260,7 @@ namespace Nascar_Races_Client
                     //Debug.WriteLine(temp);
                     Y = (float)(bottomBorderPit - temp);
                 }
-                HeadingAngle = 180 + (float)Math.Atan((Ytemp - Y) / (Xtemp - X)) * 20;
+                HeadingAngle = (float)Math.Atan((Ytemp - Y) / (Xtemp - X)) * 20;
             }
 
             /*if (IscentrifugalForce(_circleRadius) != 0 && ((_leftPerfectCircle.Y > Y && X < _leftPerfectCircle.X + _circleRadius / 2) || (_rightPerfectCircle.Y < Y && X > _rightPerfectCircle.X - _circleRadius / 2)))
