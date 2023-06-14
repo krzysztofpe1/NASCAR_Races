@@ -113,21 +113,24 @@ namespace Nascar_Races_Client
         }
         private async void ReceivingData()
         {
-            while (!IsDisposable)
             {
                 byte[] buffer = new byte[256];
                 List<byte> data = new List<byte>();
                 int lastBytesRead = 0;
-                while (true)
+                while (!IsDisposable)
                 {
-                    int bytesRead = _dataStream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead < lastBytesRead)
+                    try
                     {
-                        if (bytesRead != 0) data.AddRange(buffer.Take(bytesRead));
-                        break;
+                        int bytesRead = _dataStream.Read(buffer, 0, buffer.Length);
+                        if (bytesRead < lastBytesRead)
+                        {
+                            if (bytesRead != 0) data.AddRange(buffer.Take(bytesRead));
+                            break;
+                        }
+                        lastBytesRead = bytesRead;
+                        data.AddRange(buffer.Take(bytesRead));
                     }
-                    lastBytesRead = bytesRead;
-                    data.AddRange(buffer.Take(bytesRead));
+                    catch (Exception ex) { IsDisposable = true; break; }
                 }
                 Opponents = Deserialize<List<CarMapper>>(data.ToArray());
                 MyCar.NeighbouringCars = Opponents;
@@ -185,10 +188,12 @@ namespace Nascar_Races_Client
 
         public void Dispose()
         {
+            MyCar.IsDisposable = true;
+            SendComm(TCPSignals.killCarSignal);
+            Thread.Sleep(500);
+            IsDisposable = true;
             _dataClient.Dispose();
             _commClient.Dispose();
-            IsDisposable = true;
-            MyCar.IsDisposable = true;
         }
     }
 }

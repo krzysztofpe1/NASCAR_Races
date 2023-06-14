@@ -34,13 +34,16 @@ namespace NASCAR_Races_Server
         private Thread _collisionCheckerThread;
         private Thread _tcpListenerThread;
         private bool _killCollisionChecker = false;
-        private static string _serverIP { get; } = "127.0.0.1";
+        private static string _serverIP { get; } = "192.168.0.100";
         private static int _dataPort { get; } = 2000;
         private static int _commPort { get; } = 2001;
 
         private static Point _nextStartingPos;
         private static Point _nextPitPos;
         public bool IsRaceStarted = false;
+        private bool IsDisposable = false;
+        private TcpListener _dataServer;
+        private TcpListener _commServer;
 
         public WorldInformation Worldinformation { get; }
 
@@ -107,55 +110,27 @@ namespace NASCAR_Races_Server
 
         private void AwaitForCars()
         {
-            TcpListener dataServer = new(IPAddress.Parse(_serverIP), _dataPort);
-            TcpListener commServer = new(IPAddress.Parse(_serverIP), _commPort);
-            dataServer.Start();
-            commServer.Start();
+            _dataServer = new(IPAddress.Parse(_serverIP), _dataPort);
+            _commServer = new(IPAddress.Parse(_serverIP), _commPort);
+            _dataServer.Start();
+            _commServer.Start();
 
-            while (true)
+            while (!IsDisposable)
             {
-                TcpClient dataClient = dataServer.AcceptTcpClient();
-                TcpClient commClient = commServer.AcceptTcpClient();
-                Debug.WriteLine("Connected");
-                var temp = new ServerTCPHandler(dataClient, commClient, _nextCarNumber++);
-                ListOfCarHandlers.Add(temp);
-                temp.AllCarHandlers = ListOfCarHandlers;
-                if(IsRaceStarted)
+                try
                 {
-                    temp.Start();
-                }
+                    TcpClient dataClient = _dataServer.AcceptTcpClient();
+                    TcpClient commClient = _commServer.AcceptTcpClient();
+                    Debug.WriteLine("Connected");
+                    var temp = new ServerTCPHandler(dataClient, commClient, _nextCarNumber++);
+                    ListOfCarHandlers.Add(temp);
+                    temp.AllCarHandlers = ListOfCarHandlers;
+                    if (IsRaceStarted)
+                    {
+                        temp.Start();
+                    }
+                }catch (Exception ex) { }
             }
-        }
-
-        private bool AreRectanglesColliding(CarMapper car1, CarMapper car2)
-        {
-            double car1MinX = car1.X - car1.Length / 2;
-            double car1MaxX = car1.X + car1.Length / 2;
-            double car1MinY = car1.Y - car1.Width / 2;
-            double car1MaxY = car1.Y + car1.Width / 2;
-
-            double car2MinX = car2.X - car2.Length / 2;
-            double car2MaxX = car2.X + car2.Length / 2;
-            double car2MinY = car2.Y - car2.Width / 2;
-            double car2MaxY = car2.Y + car2.Width / 2;
-
-            // Rotate the coordinates of the second car by the angle of the first car
-            double rotationAngle = car1.HeadingAngle;
-            double cosAngle = Math.Cos(rotationAngle);
-            double sinAngle = Math.Sin(rotationAngle);
-
-            double car2RotatedMinX = (car2MinX - car1.X) * cosAngle - (car2MinY - car1.Y) * sinAngle + car1.X;
-            double car2RotatedMaxX = (car2MaxX - car1.X) * cosAngle - (car2MaxY - car1.Y) * sinAngle + car1.X;
-            double car2RotatedMinY = (car2MinX - car1.X) * sinAngle + (car2MinY - car1.Y) * cosAngle + car1.Y;
-            double car2RotatedMaxY = (car2MaxX - car1.X) * sinAngle + (car2MaxY - car1.Y) * cosAngle + car1.Y;
-
-            if (car1MaxX < car2RotatedMinX || car1MinX > car2RotatedMaxX)
-                return false;
-
-            if (car1MaxY < car2RotatedMinY || car1MinY > car2RotatedMaxY)
-                return false;
-
-            return true;
         }
         private (double, double) rotateCar(double X, double Y, double Angle, double centerX, double centerY)
         {
@@ -164,20 +139,6 @@ namespace NASCAR_Races_Server
             double newY = centerY + (X - centerX ) * Math.Sin(Angle) + (Y - centerY) * Math.Cos(Angle);
             return (newX, newY);
         }
-
-        private bool IsSeparatingAxis(List<(double, double)> car1Points, List<(double, double)> car2Points, (double, double) axis)
-        {
-            // Project points onto axis
-            List<double> car1Projections = car1Points.Select(point => point.Item1 * axis.Item1 + point.Item2 * axis.Item2).ToList();
-            List<double> car2Projections = car2Points.Select(point => point.Item1 * axis.Item1 + point.Item2 * axis.Item2).ToList();
-
-            // Check for overlap
-            if (car1Projections.Max() < car2Projections.Min() || car2Projections.Max() < car1Projections.Min())
-                return true; // There is no overlap along this axis, it's a separating axis
-
-            return false;
-        }
-        // 
         private bool AreCarsColliding(CarMapper car1, CarMapper car2)
         {
             // A---------B
@@ -267,29 +228,31 @@ namespace NASCAR_Races_Server
 
             return false;
         }
-        private Point NextStartingPoint()
-        {
-            Point tempPoint = new(_nextStartingPos.X, _nextStartingPos.Y);
-            _nextStartingPos.X -= _straightLength / 30;
-            _nextStartingPos.Y = (_nextStartingPos.Y == _firstRow) ? _secondRow : _firstRow;
-            return tempPoint;
-        }
-        private Point NextPitPoint()
-        {
-            Point temp = new(_nextPitPos.X, _nextPitPos.Y);
-            _nextPitPos.X -= Worldinformation.CarLength * 4;
-            return temp;
-        }
 
         public void StartRace()
         {
             IsRaceStarted = true;
+            _killCollisionChecker = false;
             ListOfCarHandlers.ForEach(handler => { handler.Start(); });
             _collisionCheckerThread.Start();
         }
         public void KillThreads()
         {
             _killCollisionChecker = true;
+            ListOfCarHandlers.ForEach(handler => { handler.Dispose(); });
+            ListOfCarHandlers = new();
+            Thread.Sleep(500);
+            _tcpListenerThread.Interrupt();
+            _commServer.Stop();
+            _dataServer.Stop();
+            IsDisposable = true;
+        }
+        public void StopRace()
+        {
+            _killCollisionChecker = true;
+            ListOfCarHandlers.ForEach(handler => { handler.Dispose(); });
+            ListOfCarHandlers = new();
+            Thread.Sleep(500);
         }
     }
 }

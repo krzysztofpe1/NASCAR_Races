@@ -60,45 +60,61 @@ namespace NASCAR_Races_Server
         {
             while (!IsDisposable)
             {
-                byte[] response = new byte[_dataLength];
-                int bytesRead = _dataStream.Read(response, 0, _dataLength);
-                var temp = DeserializeCar(response);
-                _myCar = temp;
-                SendingComm(TCPSignals.serverReadyForData);
+                try
+                {
+                    byte[] response = new byte[_dataLength];
+                    int bytesRead = _dataStream.Read(response, 0, _dataLength);
+                    var temp = DeserializeCar(response);
+                    _myCar = temp;
+                    SendingComm(TCPSignals.serverReadyForData);
+                }
+                catch (Exception ex) { IsDisposable = true; }
             }
         }
         private void SendingData()
         {
             while (!IsDisposable)
             {
-                if (!_clientReadyForNextData) continue;
-                Thread.Sleep(50);
-                List<CarMapper> cars = new List<CarMapper>();
-                AllCarHandlers.ForEach(carHandler =>
+                try
                 {
-                    if (carHandler != this)
-                        cars.Add(carHandler.GetCar());
-                });
-                byte[] dataToSend = Serialize(cars);
-                _dataStream.Write(dataToSend, 0, dataToSend.Length);
+                    if (!_clientReadyForNextData) continue;
+                    Thread.Sleep(50);
+                    List<CarMapper> cars = new List<CarMapper>();
+                    AllCarHandlers.ForEach(carHandler =>
+                    {
+                        if (carHandler != this)
+                            cars.Add(carHandler.GetCar());
+                    });
+                    byte[] dataToSend = Serialize(cars);
+                    _dataStream.Write(dataToSend, 0, dataToSend.Length);
+                }
+                catch (Exception ex) { IsDisposable = true; }
             }
         }
         private void ReceivingComm()
         {
             while (!IsDisposable)
             {
-                int response = _commStream.ReadByte();
-                switch (response)
+                try
                 {
-                    case TCPSignals.clientReadyForData:
-                        _clientReadyForNextData = true;
-                        break;
-                    default: break;
+                    int response = _commStream.ReadByte();
+                    switch (response)
+                    {
+                        case TCPSignals.clientReadyForData:
+                            _clientReadyForNextData = true;
+                            break;
+                        case TCPSignals.killCarSignal:
+                            Dispose();
+                            break;
+                        default: break;
+                    }
                 }
+                catch (Exception ex) { IsDisposable = true; }
             }
         }
         private void SendingComm(int signal)
         {
+            if (IsDisposable) return;
             _commStream.WriteByte((byte)signal);
         }
         private byte[] Serialize(object obj)
@@ -148,11 +164,19 @@ namespace NASCAR_Races_Server
         }
         public void Start()
         {
+            if (IsDisposable) return;
             SendingComm(TCPSignals.startRaceSignal);
         }
         public void Kill()
         {
             SendingComm(TCPSignals.killCarSignal);
+        }
+        public void Dispose()
+        {
+            SendingComm(TCPSignals.killCarSignal);
+            IsDisposable = true;
+            _dataClient.Dispose();
+            _commClient.Dispose();
         }
     }
 }

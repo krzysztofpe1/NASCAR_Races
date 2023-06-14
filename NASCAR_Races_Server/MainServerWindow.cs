@@ -55,12 +55,15 @@ namespace NASCAR_Races_Server
             {
                 //if race hadn't started yet
                 _raceManager.StartRace();
+                _raceStarted = true;
+                button1.Text = "Stop race";
             }
             else
             {
-                _raceManager.KillThreads();
+                _raceStarted = false;
+                _raceManager.StopRace();
+                button1.Text = "Start race";
             }
-            _raceStarted = !_raceStarted;
         }
     }
 }

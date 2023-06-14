@@ -64,7 +64,7 @@ namespace Nascar_Races_Client
 
         public void PaintCarsPosition(Graphics g)
         {
-            if (listOfCars.Count() == 0)
+            if (listOfCars.Count() == 0||listOfCars==null)
             {
                 return;
             }
@@ -75,6 +75,7 @@ namespace Nascar_Races_Client
 
         private void PaintCar(Graphics g, DrawableCar car)
         {
+            if (car == null) return;
             if (!float.IsNaN(car.X))
             {
                 g.TranslateTransform(car.X, car.Y);
